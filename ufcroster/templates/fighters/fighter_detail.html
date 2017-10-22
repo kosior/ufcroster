@@ -1,0 +1,6 @@
+<div>{{ fighter.name }}</div>
+<div>{{ fighter.urls.ufc }}</div>
+<div>{{ fighter.get_absolute_url }}</div>
+{% if fighter.image %}
+    <div><img src="{{ fighter.image.url }}"></div>
+{% endif %}

@@ -1,0 +1,8 @@
+venv
+.idea
+__pycache__
+ufcroster/fighters/migrations/*
+!ufcroster/fighters/migrations/__init__.py
+ufcroster/users/migrations/*
+!ufcroster/users/migrations/__init__.py
+media/
