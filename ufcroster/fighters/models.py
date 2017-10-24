@@ -7,13 +7,21 @@ from .managers import FighterQuerySet
 
 
 class Fighter(models.Model):
-    slug = models.SlugField(unique=True)
+    FEMALE = 'F'
+    MALE = 'M'
 
+    GENDER = (
+        (FEMALE, _('Female')),
+        (MALE, _('Male')),
+    )
+
+    slug = models.SlugField(unique=True, blank=True)
     name = models.CharField(_('Full name'), max_length=255)
     nickname = models.CharField(_('Nickname'), max_length=255, blank=True)
     birthdate = models.DateField(_('Birthdate'), blank=True, null=True)
     birthplace = models.CharField(_('Brith place'), max_length=50, blank=True)
     nationality = models.CharField(_('Nationality'), max_length=20, blank=True)
+    gender = models.CharField(max_length=1, blank=True)
 
     height = models.CharField(_('Height'), max_length=6, blank=True)
     height_imp = models.CharField(_('Height imperial'), max_length=6, blank=True)
@@ -34,6 +42,9 @@ class Fighter(models.Model):
 
     objects = FighterQuerySet.as_manager()
 
+    class Meta:
+        ordering = ['rank']
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
@@ -44,7 +55,7 @@ class Fighter(models.Model):
     def get_absolute_url(self):
         if self.active:
             return reverse('fighters:detail', kwargs={'slug': self.slug})
-        return self.urls.ufc
+        return self.urls.sherdog
 
 
 class FighterUrls(models.Model):
