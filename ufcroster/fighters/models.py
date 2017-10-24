@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 
+from events.models import Event
 from .managers import FighterQuerySet
 
 
@@ -73,3 +74,59 @@ class FighterUrls(models.Model):
 
     class Meta:
         verbose_name_plural = 'FighterUrls'
+
+
+class FightDetails(models.Model):
+    AMATEUR = 'A'
+    EXHIBITION = 'E'
+    PROFESSIONAL = 'P'
+
+    FIGHT_TYPES = (
+        (AMATEUR, _('Amateur')),
+        (EXHIBITION, _('Exhibition fight')),
+        (PROFESSIONAL, _('Professional'))
+    )
+
+    event = models.ForeignKey(Event, related_name='fights', blank=True, null=True, on_delete=models.CASCADE)
+    type = models.CharField(max_length=1, choices=FIGHT_TYPES, blank=True)
+    method = models.CharField(max_length=30, blank=True)
+    round = models.CharField(max_length=2, blank=True)
+    time = models.CharField(max_length=5, blank=True)
+    referee = models.CharField(max_length=255, blank=True)
+    ordinal = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = 'FightDetails'
+
+    def __str__(self):
+        return str(self.pk)
+
+
+class Fight(models.Model):
+    WIN = 'W'
+    LOSS = 'L'
+    DRAW = 'D'
+    NOCONTEST = 'NC'
+    UPCOMING = 'U'
+
+    RESULTS = (
+        (WIN, _('Win')),
+        (LOSS, _('Loss')),
+        (DRAW, _('Draw')),
+        (NOCONTEST, _('No contest')),
+        (UPCOMING, _('Upcoming')),
+    )
+
+    detail = models.ForeignKey(FightDetails, related_name='fights', on_delete=models.CASCADE)
+    fighter = models.ForeignKey(Fighter, related_name='fights', on_delete=models.CASCADE)
+    opponent = models.ForeignKey(Fighter, on_delete=models.CASCADE)
+    opponent_last_5 = models.CharField(max_length=20, blank=True)
+    opponent_record_before = models.CharField(max_length=20, blank=True)
+    result = models.CharField(max_length=2, choices=RESULTS, blank=True)
+    ordinal = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ('detail', 'fighter')
+
+    def __str__(self):
+        return f'{self.fighter.name} {self.get_result_display()} {self.opponent.name}'
