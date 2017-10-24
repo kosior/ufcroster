@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'fighters',
+    'events',
 ]
 
 SITE_ID = 1
