@@ -1,10 +1,14 @@
 from django.contrib import admin
 
-from .models import Fighter, FighterUrls, FightDetails, Fight
+from .models import Fighter, FighterRecord, FighterUrls, FightDetails, Fight
 
 
 class FighterAdmin(admin.ModelAdmin):
     list_display = ('name', 'nickname', 'in_ufc')
+
+
+class FighterRecordAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'wins', 'losses', 'draws', 'nc')
 
 
 class FighterUrlsAdmin(admin.ModelAdmin):
@@ -20,6 +24,7 @@ class FightAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Fighter, FighterAdmin)
+admin.site.register(FighterRecord, FighterRecordAdmin)
 admin.site.register(FighterUrls, FighterUrlsAdmin)
 admin.site.register(FightDetails, FightDetailsAdmin)
 admin.site.register(Fight, FightAdmin)

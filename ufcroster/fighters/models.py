@@ -59,6 +59,35 @@ class Fighter(models.Model):
         return self.urls.sherdog
 
 
+class FighterRecord(models.Model):
+    fighter = models.OneToOneField(Fighter, related_name='record', on_delete=models.CASCADE)
+
+    wins = models.IntegerField(blank=True, null=True, default=0)
+    losses = models.IntegerField(blank=True, null=True, default=0)
+    draws = models.IntegerField(blank=True, null=True, default=0)
+    nc = models.IntegerField(blank=True, null=True, default=0)
+
+    wins_ko_tko = models.IntegerField(blank=True, null=True, default=0)
+    wins_sub = models.IntegerField(blank=True, null=True, default=0)
+    wins_dec = models.IntegerField(blank=True, null=True, default=0)
+    wins_other = models.IntegerField(blank=True, null=True, default=0)
+
+    losses_ko_tko = models.IntegerField(blank=True, null=True, default=0)
+    losses_sub = models.IntegerField(blank=True, null=True, default=0)
+    losses_dec = models.IntegerField(blank=True, null=True, default=0)
+    losses_other = models.IntegerField(blank=True, null=True, default=0)
+
+    def __str__(self):
+        return f'{self.fighter.name} {self.total}'
+
+    @property
+    def total(self):
+        record = f'{self.wins}-{self.losses}-{self.draws}'
+        if self.nc:
+            record = f'{record} N/C: {self.nc} '
+        return record
+
+
 class FighterUrls(models.Model):
     fighter = models.OneToOneField(Fighter, related_name='urls', on_delete=models.CASCADE)
 
