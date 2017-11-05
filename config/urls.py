@@ -4,9 +4,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 
+api_patterns = [
+    url(r'^', include('fighters.api.urls')),
+    url(r'^', include('events.api.urls')),
+]
+
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^api/', include('fighters.api.urls', namespace='api')),
+    url(r'^api/', include(api_patterns, namespace='api')),
     url(r'', include('fighters.urls')),
 ]
 
