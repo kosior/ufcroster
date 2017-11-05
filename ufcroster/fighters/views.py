@@ -5,5 +5,5 @@ from .models import Fighter
 
 class FighterDetail(DetailView):
     model = Fighter
-    queryset = Fighter.objects.with_urls()
+    queryset = Fighter.objects.full_fighter()
     context_object_name = 'fighter'

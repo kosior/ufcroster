@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Fighter, FighterRecord, FighterUrls, FightDetails, Fight
+from .models import Fighter, FighterRecord, FighterUrls, FullFight, PartFight
 
 
 class FighterAdmin(admin.ModelAdmin):
@@ -15,16 +15,16 @@ class FighterUrlsAdmin(admin.ModelAdmin):
     list_display = ('fighter', 'ufc', 'sherdog')
 
 
-class FightDetailsAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'event', 'type')
+class FullFightAdmin(admin.ModelAdmin):
+    list_display = ('part_1', 'part_2', 'event', 'type', 'status')
 
 
-class FightAdmin(admin.ModelAdmin):
+class PartFightAdmin(admin.ModelAdmin):
     list_display = ('fighter', 'result', 'opponent')
 
 
 admin.site.register(Fighter, FighterAdmin)
 admin.site.register(FighterRecord, FighterRecordAdmin)
 admin.site.register(FighterUrls, FighterUrlsAdmin)
-admin.site.register(FightDetails, FightDetailsAdmin)
-admin.site.register(Fight, FightAdmin)
+admin.site.register(FullFight, FullFightAdmin)
+admin.site.register(PartFight, PartFightAdmin)
