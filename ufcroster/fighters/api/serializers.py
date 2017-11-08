@@ -54,11 +54,13 @@ class FighterSerializer(serializers.HyperlinkedModelSerializer):
         return fighter
 
     def update(self, instance, validated_data):
-        urls = validated_data.pop('urls')
-        record = validated_data.pop('record')
+        urls = validated_data.pop('urls', None)
+        record = validated_data.pop('record', None)
         fighter = super().update(instance, validated_data)
-        FighterUrlsSerializer().update(fighter.urls, urls)
-        FighterRecordSerializer().update(fighter.record, record)
+        if urls:
+            FighterUrlsSerializer().update(fighter.urls, urls)
+        if record:
+            FighterRecordSerializer().update(fighter.record, record)
         return fighter
 
 
