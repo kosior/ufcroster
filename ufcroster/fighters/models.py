@@ -4,7 +4,7 @@ from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 
 from events.models import Event
-from .managers import FullFightManager, PartFightManager, FighterManagerWithQueryset
+from .managers import FightDetailsManager, FightManager, FighterManagerWithQueryset
 
 
 class Fighter(models.Model):
@@ -109,48 +109,10 @@ class FighterUrls(models.Model):
     twitter = models.URLField(max_length=100, blank=True)
 
     class Meta:
-        verbose_name_plural = 'FighterUrls'
+        verbose_name_plural = 'Fighter urls'
 
 
-class PartFight(models.Model):
-    WIN = 'W'
-    LOSS = 'L'
-    DRAW = 'D'
-    NOCONTEST = 'NC'
-
-    RESULTS = (
-        (WIN, _('Win')),
-        (LOSS, _('Loss')),
-        (DRAW, _('Draw')),
-        (NOCONTEST, _('No contest')),
-    )
-
-    date = models.DateTimeField(blank=True, null=True)
-    fighter = models.ForeignKey(Fighter, related_name='fights', on_delete=models.CASCADE)
-    opponent = models.ForeignKey(Fighter, on_delete=models.CASCADE, null=True)
-    opponent_last_5 = models.CharField(max_length=20, blank=True)
-    opponent_record_before = models.CharField(max_length=20, blank=True)
-    result = models.CharField(max_length=2, choices=RESULTS, blank=True)
-    ordinal = models.IntegerField(blank=True, null=True)
-
-    objects = PartFightManager()
-
-    class Meta:
-        unique_together = ('date', 'fighter', 'opponent')
-        ordering = ['-date', '-ordinal']
-
-    @property
-    def details(self):
-        if hasattr(self, 'details_1'):
-            return self.details_1
-        elif hasattr(self, 'details_2'):
-            return self.details_2
-
-    def __str__(self):
-        return f'{self.fighter_id} {self.get_result_display()} {self.opponent_id}'
-
-
-class FullFight(models.Model):
+class FightDetails(models.Model):
     AMATEUR = 'A'
     EXHIBITION = 'E'
     PROFESSIONAL = 'P'
@@ -169,28 +131,54 @@ class FullFight(models.Model):
         (PAST, _('Past'))
     )
 
-    status = models.CharField(max_length=1, choices=STATUS, null=True, blank=True)
     event = models.ForeignKey(Event, related_name='fights', blank=True, null=True, on_delete=models.CASCADE)
+
+    status = models.CharField(max_length=1, choices=STATUS, null=True, blank=True)
+    date = models.DateTimeField(blank=True, null=True)
     type = models.CharField(max_length=1, choices=FIGHT_TYPES, blank=True)
     method = models.CharField(max_length=30, blank=True)
     round = models.CharField(max_length=2, blank=True)
     time = models.CharField(max_length=5, blank=True)
     referee = models.CharField(max_length=255, blank=True)
-    ordinal = models.IntegerField(blank=True, null=True)
+    ordinal = models.IntegerField(blank=True, null=True, default=None)
 
-    part_1 = models.OneToOneField(PartFight, related_name='details_1', null=True, on_delete=models.CASCADE)
-    part_2 = models.OneToOneField(PartFight, related_name='details_2', null=True, on_delete=models.CASCADE)
-
-    objects = FullFightManager()
+    objects = FightDetailsManager()
 
     class Meta:
-        unique_together = ()
+        ordering = ['-date']
+        verbose_name_plural = 'Fight details'
 
     def __str__(self):
-        return f'{self.part_1} {self.status} {self.part_2}'
+        return f'{self.pk} {self.date} {self.status} {self.type}'
 
-    def fill_empty_part(self, part_fight):
-        if not self.part_1:
-            self.part_1 = part_fight
-        elif not self.part_2:
-            self.part_2 = part_fight
+
+class Fight(models.Model):
+    WIN = 'W'
+    LOSS = 'L'
+    DRAW = 'D'
+    NOCONTEST = 'NC'
+
+    RESULTS = (
+        (WIN, _('Win')),
+        (LOSS, _('Loss')),
+        (DRAW, _('Draw')),
+        (NOCONTEST, _('No contest')),
+    )
+
+    details = models.ForeignKey(FightDetails, related_name='fights', on_delete=models.CASCADE)
+    fighter = models.ForeignKey(Fighter, related_name='fights', on_delete=models.CASCADE)
+    opponent = models.ForeignKey(Fighter, null=True, on_delete=models.CASCADE)
+
+    opponent_last_5 = models.CharField(max_length=20, blank=True)
+    opponent_record_before = models.CharField(max_length=20, blank=True)
+    result = models.CharField(max_length=2, choices=RESULTS, blank=True)
+    ordinal = models.IntegerField(blank=True, null=True)
+
+    objects = FightManager()
+
+    class Meta:
+        unique_together = ('details', 'fighter', 'opponent')
+        ordering = ['-details__date', '-ordinal']
+
+    def __str__(self):
+        return f'{self.fighter.name} {self.get_result_display()} {self.opponent.name}'

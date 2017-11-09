@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 
 from .serializers import FighterSerializer, FightSerializer
-from ..models import Fighter, PartFight
+from ..models import Fighter, Fight
 
 
 class FighterViewSet(viewsets.ModelViewSet):
@@ -25,4 +25,4 @@ class FightViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         slug = self.kwargs.get('slug')
         fighter = get_object_or_404(Fighter, slug=slug)
-        return PartFight.objects.full_fights(fighter=fighter)
+        return Fight.objects.full_fights(fighter=fighter)

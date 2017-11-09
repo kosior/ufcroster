@@ -1,30 +1,32 @@
 from django.contrib import admin
 
-from .models import Fighter, FighterRecord, FighterUrls, FullFight, PartFight
+from .models import Fighter, FighterRecord, FighterUrls, FightDetails, Fight
 
 
 class FighterAdmin(admin.ModelAdmin):
-    list_display = ('name', 'nickname', 'in_ufc')
+    list_display = ('name', 'active', 'in_ufc')
 
 
 class FighterRecordAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'wins', 'losses', 'draws', 'nc')
+    list_display = ('fighter', )
 
 
 class FighterUrlsAdmin(admin.ModelAdmin):
     list_display = ('fighter', 'ufc', 'sherdog')
 
 
-class FullFightAdmin(admin.ModelAdmin):
-    list_display = ('part_1', 'part_2', 'event', 'type', 'status')
+class FightDetailsAdmin(admin.ModelAdmin):
+    list_display = ('date', 'type', 'status', 'event')
+    list_select_related = ('event', )
 
 
-class PartFightAdmin(admin.ModelAdmin):
+class FightAdmin(admin.ModelAdmin):
     list_display = ('fighter', 'result', 'opponent')
+    list_select_related = ('fighter', 'opponent', 'details')
 
 
 admin.site.register(Fighter, FighterAdmin)
 admin.site.register(FighterRecord, FighterRecordAdmin)
 admin.site.register(FighterUrls, FighterUrlsAdmin)
-admin.site.register(FullFight, FullFightAdmin)
-admin.site.register(PartFight, PartFightAdmin)
+admin.site.register(FightDetails, FightDetailsAdmin)
+admin.site.register(Fight, FightAdmin)

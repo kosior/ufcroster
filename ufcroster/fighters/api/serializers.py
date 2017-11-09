@@ -3,7 +3,7 @@ from rest_framework import serializers
 from common.utils import restructure_fields_by_template
 from events.api.serializers import EventSerializer
 from events.models import Event
-from ..models import Fighter, FighterUrls, FighterRecord, PartFight, FullFight
+from ..models import Fighter, FighterUrls, FighterRecord, Fight, FightDetails
 
 
 class FieldsByTemplateMixin:
@@ -64,11 +64,11 @@ class FighterSerializer(serializers.HyperlinkedModelSerializer):
         return fighter
 
 
-class FullFightSerializer(FieldsByTemplateMixin, serializers.ModelSerializer):
+class FightDetailsSerializer(FieldsByTemplateMixin, serializers.ModelSerializer):
     event = EventSerializer()
 
     class Meta:
-        model = FullFight
+        model = FightDetails
         fields = '__all__'
         extra_fields = ('event',)
 
@@ -83,16 +83,23 @@ class FighterFightSerializer(FieldsByTemplateMixin, FighterSerializer):
 
 
 class FightSerializer(serializers.ModelSerializer):
-    details = FullFightSerializer()
+    details = FightDetailsSerializer()
     opponent = FighterFightSerializer()
 
     class Meta:
-        model = PartFight
-        exclude = ('fighter', )
+        model = Fight
+        exclude = ('fighter',)
         extra_fields = ('opponent', 'details')
 
     def _get_slug(self):
-        return self.context.get('view').kwargs.get('slug')
+        try:
+            slug = self.context.get('view').kwargs.get('slug')
+        except AttributeError:
+            slug = self.context.get('slug')
+        finally:
+            if not slug:
+                raise ValueError('Slug is none')
+            return slug
 
     def _single_create(self, fighter, validated_data):
         opponent_data = validated_data.pop('opponent')
@@ -100,12 +107,11 @@ class FightSerializer(serializers.ModelSerializer):
         event_data = details_data.pop('event')
 
         opponent, _ = Fighter.objects.rest_get_or_create(**opponent_data)
-
-        part_fight = PartFight.objects.create(fighter=fighter, opponent=opponent, **validated_data)
         event, _ = Event.objects.get_or_create(**event_data)
+        fight_details, _ = FightDetails.objects.get_or_create(event=event, **details_data)
 
-        FullFight.objects.rest_create_or_update(event=event, part_fight=part_fight, **details_data)
-        return part_fight
+        fight = Fight.objects.create(fighter=fighter, opponent=opponent, details=fight_details, **validated_data)
+        return fight
 
     def _bulk_create(self, fighter, validated_data_list):
         return_list = []
