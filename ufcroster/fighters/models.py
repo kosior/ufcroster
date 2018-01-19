@@ -89,7 +89,7 @@ class FighterRecord(models.Model):
 
     @property
     def total(self):
-        record = f'{self.wins}-{self.losses}-{self.draws}'
+        record = f'{self.wins} - {self.losses} - {self.draws}'
         if self.nc:
             record = f'{record} N/C: {self.nc} '
         return record
@@ -110,6 +110,23 @@ class FighterUrls(models.Model):
 
     class Meta:
         verbose_name_plural = 'Fighter urls'
+
+    @property
+    def display_list(self):
+        display_list = [
+            ('ufc', 'UFC'),
+            ('sherdog', 'SHERDOG'),
+            ('wiki', 'WIKI'),
+            ('website', 'WWW'),
+            ('instagram', '<i class="fa fa-lg fa-instagram" aria-hidden="true"></i>'),
+            ('facebook', '<i class="fa fa-lg fa-facebook" aria-hidden="true"></i>'),
+            ('youtube', '<i class="fa fa-lg fa-youtube-play" aria-hidden="true"></i>'),
+            ('twitter', '<i class="fa fa-lg fa-twitter" aria-hidden="true"></i>')
+        ]
+        for field_name, display in display_list:
+            url_ = getattr(self, field_name)
+            if url_:
+                yield (url_, display)
 
 
 class FightDetails(models.Model):
@@ -151,6 +168,10 @@ class FightDetails(models.Model):
     def __str__(self):
         return f'{self.pk} {self.date} {self.status} {self.type}'
 
+    @property
+    def method_display(self):
+        return self.method.replace(' ', '\n', 1)
+
 
 class Fight(models.Model):
     WIN = 'W'
@@ -182,3 +203,7 @@ class Fight(models.Model):
 
     def __str__(self):
         return f'{self.fighter.name} {self.get_result_display()} {self.opponent.name}'
+
+    @property
+    def opponent_last_5_list(self):
+        return self.opponent_last_5.split(',')
