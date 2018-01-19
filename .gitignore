@@ -8,3 +8,4 @@ ufcroster/users/migrations/*
 ufcroster/events/migrations/*
 !ufcroster/events/migrations/__init__.py
 media/
+scrapper/
