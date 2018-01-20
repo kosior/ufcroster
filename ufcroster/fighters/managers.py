@@ -6,6 +6,10 @@ def get_fight_model():
     return apps.get_model('fighters', 'Fight')
 
 
+def get_fight_details_model():
+    return apps.get_model('fighters', 'FightDetails')
+
+
 class FighterQuerySet(models.QuerySet):
     def with_urls(self):
         return self.select_related('urls')
@@ -21,7 +25,8 @@ class FighterQuerySet(models.QuerySet):
 
     def full_fighter(self):
         Fight = get_fight_model()
-        qs = Fight.objects.fight_with_relations()
+        FightDetails = get_fight_details_model()
+        qs = Fight.objects.fight_with_relations().exclude(details__status=FightDetails.UPCOMING)
         prefetch = models.Prefetch('fights', queryset=qs, to_attr='fights_list')
         return self.details().prefetch_related(prefetch)
 
