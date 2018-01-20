@@ -65,6 +65,18 @@ class Fighter(models.Model):
     def create_record(self, **record):
         FighterRecord.objects.create(fighter=self, **record)
 
+    def get_fight_ordinal(self, fight_details):
+        if fight_details.status == FightDetails.UPCOMING:
+            return self.fights.filter(details__type=FightDetails.PROFESSIONAL).count() + 1
+        return self.fights.filter(details=fight_details).values_list('ordinal', flat=True).first()
+
+    def upcoming_fight(self):
+        return self.fights.fight_with_relations().filter(details__status=FightDetails.UPCOMING).first()
+
+    @property
+    def last_5_results(self):
+        return self.fights.values_list('result', flat=True)[:6]
+
 
 class FighterRecord(models.Model):
     fighter = models.OneToOneField(Fighter, related_name='record', on_delete=models.CASCADE)
@@ -153,7 +165,7 @@ class FightDetails(models.Model):
     status = models.CharField(max_length=1, choices=STATUS, null=True, blank=True)
     date = models.DateTimeField(blank=True, null=True)
     type = models.CharField(max_length=1, choices=FIGHT_TYPES, blank=True)
-    method = models.CharField(max_length=30, blank=True)
+    method = models.CharField(max_length=128, blank=True)
     round = models.CharField(max_length=2, blank=True)
     time = models.CharField(max_length=5, blank=True)
     referee = models.CharField(max_length=255, blank=True)
@@ -206,4 +218,6 @@ class Fight(models.Model):
 
     @property
     def opponent_last_5_list(self):
-        return self.opponent_last_5.split(',')
+        if self.opponent_last_5:
+            return self.opponent_last_5.split(',')
+        return []
