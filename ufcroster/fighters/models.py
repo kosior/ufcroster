@@ -106,6 +106,14 @@ class FighterRecord(models.Model):
             record = f'{record} N/C: {self.nc} '
         return record
 
+    def is_consistent(self):
+        wins_sum = self.wins_ko_tko + self.wins_sub + self.wins_dec + self.wins_other
+        losses_sum = self.losses_ko_tko + self.losses_sub + self.losses_dec + self.losses_other
+
+        if self.wins == wins_sum and self.losses == losses_sum:
+            return True
+        return False
+
 
 class FighterUrls(models.Model):
     fighter = models.OneToOneField(Fighter, related_name='urls', on_delete=models.CASCADE)
@@ -152,6 +160,22 @@ class FightDetails(models.Model):
         (PROFESSIONAL, _('Professional'))
     )
 
+    KO_TKO = 'KO/TKO'
+    SUBMISSION = 'SUBMISSION'
+    DECISION = 'DECISION'
+    OTHER = 'OTHER'
+    NC = 'NC'
+    DRAW = 'DRAW'
+
+    METHOD_TYPES = (
+        (KO_TKO, 'KO/TKO'),
+        (SUBMISSION, 'SUBMISSION'),
+        (DECISION, 'DECISION'),
+        (OTHER, 'OTHER'),
+        (NC, 'NC'),
+        (DRAW, 'DRAW')
+    )
+
     UPCOMING = 'U'
     PAST = 'P'
 
@@ -166,6 +190,7 @@ class FightDetails(models.Model):
     date = models.DateTimeField(blank=True, null=True)
     type = models.CharField(max_length=1, choices=FIGHT_TYPES, blank=True)
     method = models.CharField(max_length=128, blank=True)
+    method_type = models.CharField(max_length=15, choices=METHOD_TYPES, blank=True, null=True, default=None)
     round = models.CharField(max_length=2, blank=True)
     time = models.CharField(max_length=5, blank=True)
     referee = models.CharField(max_length=255, blank=True)
