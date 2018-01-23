@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_countries',
+    'common',
     'users',
     'fighters',
     'events',
@@ -162,6 +163,6 @@ REST_FRAMEWORK = {
 
 }
 
-COUNTRIES_URL = [
+COUNTRIES_URL_CODES = {
     'pl',
-]
+}
