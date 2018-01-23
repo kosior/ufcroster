@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
+from django_countries.fields import CountryField
 
 from events.models import Event
 from .managers import FightDetailsManager, FightManager, FighterManagerWithQueryset
@@ -21,7 +22,7 @@ class Fighter(models.Model):
     nickname = models.CharField(_('Nickname'), max_length=255, blank=True, null=True)
     birthdate = models.DateField(_('Birthdate'), blank=True, null=True)
     birthplace = models.CharField(_('Brith place'), max_length=50, blank=True)
-    country = models.CharField(_('Country'), max_length=50, blank=True)
+    country = CountryField(blank=True, null=True, default=None)
     nationality = models.CharField(_('Nationality'), max_length=20, blank=True)
     gender = models.CharField(max_length=1, blank=True, choices=GENDER)
 

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_countries',
     'users',
     'fighters',
     'events',
@@ -160,3 +161,7 @@ REST_FRAMEWORK = {
     ],
 
 }
+
+COUNTRIES_URL = [
+    'pl',
+]
