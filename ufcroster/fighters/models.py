@@ -4,11 +4,12 @@ from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_countries.fields import CountryField
 
+from common.models import TimeStampedModel
 from events.models import Event
 from .managers import FightDetailsManager, FightManager, FighterManagerWithQueryset
 
 
-class Fighter(models.Model):
+class Fighter(TimeStampedModel):
     FEMALE = 'F'
     MALE = 'M'
 
@@ -79,7 +80,7 @@ class Fighter(models.Model):
         return self.fights.values_list('result', flat=True)[:6]
 
 
-class FighterRecord(models.Model):
+class FighterRecord(TimeStampedModel):
     fighter = models.OneToOneField(Fighter, related_name='record', on_delete=models.CASCADE)
 
     wins = models.IntegerField(blank=True, null=True, default=0)
@@ -116,7 +117,7 @@ class FighterRecord(models.Model):
         return False
 
 
-class FighterUrls(models.Model):
+class FighterUrls(TimeStampedModel):
     fighter = models.OneToOneField(Fighter, related_name='urls', on_delete=models.CASCADE)
 
     ufc = models.URLField(max_length=100, blank=True, null=True, unique=True)
@@ -150,7 +151,7 @@ class FighterUrls(models.Model):
                 yield (url_, display)
 
 
-class FightDetails(models.Model):
+class FightDetails(TimeStampedModel):
     AMATEUR = 'A'
     EXHIBITION = 'E'
     PROFESSIONAL = 'P'
@@ -211,7 +212,7 @@ class FightDetails(models.Model):
         return self.method.replace(' ', '\n', 1)
 
 
-class Fight(models.Model):
+class Fight(TimeStampedModel):
     WIN = 'W'
     LOSS = 'L'
     DRAW = 'D'
