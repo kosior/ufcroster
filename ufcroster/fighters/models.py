@@ -1,10 +1,14 @@
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_countries.fields import CountryField
+from versatileimagefield.fields import VersatileImageField
+from versatileimagefield.placeholder import OnStoragePlaceholderImage
 
 from common.models import TimeStampedModel
+from common.utils import get_image_data
 from events.models import Event
 from .managers import FightDetailsManager, FightManager, FighterManagerWithQueryset
 
@@ -79,6 +83,18 @@ class Fighter(TimeStampedModel):
     def last_5_results(self):
         return self.fights.values_list('result', flat=True)[:6]
 
+    @property
+    def main_image_url(self):
+        image = self.images.first()
+        if not image:
+            return settings.MEDIA_URL + 'fighters/placeholder.png'
+        return image.image.url
+
+    def add_image(self, url):
+        image = FighterImage(fighter=self)
+        image.image.save(*get_image_data(url), save=False)
+        image.save()
+
 
 class FighterRecord(TimeStampedModel):
     fighter = models.OneToOneField(Fighter, related_name='record', on_delete=models.CASCADE)
@@ -149,6 +165,19 @@ class FighterUrls(TimeStampedModel):
             url_ = getattr(self, field_name)
             if url_:
                 yield (url_, display)
+
+
+def fighter_images_directory_path(instance, filename):
+    return f'fighters/{instance.fighter_id}/{instance.id}{filename}'
+
+
+class FighterImage(TimeStampedModel):
+    fighter = models.ForeignKey(Fighter, related_name='images')
+    image = VersatileImageField(upload_to=fighter_images_directory_path, blank=True,
+                                placeholder_image=OnStoragePlaceholderImage(path='fighters/placeholder.png'))
+
+    class Meta:
+        ordering = ['-created']
 
 
 class FightDetails(TimeStampedModel):
