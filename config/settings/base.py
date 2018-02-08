@@ -1,8 +1,8 @@
+import logging.config
 import os
 import socket
 
 import environ
-
 
 ROOT_DIR = environ.Path(__file__) - 3
 APPS_DIR = ROOT_DIR.path('ufcroster')
@@ -116,6 +116,24 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
+
+LOGGING_CONFIG = None
+
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'common': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
+})
 
 
 # Internationalization
