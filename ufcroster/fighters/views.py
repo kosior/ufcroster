@@ -33,4 +33,4 @@ class FightersByCountry(CountryCodeMixin, ListView):
 
     def get_queryset(self):
         in_ufc = 'released' not in self.request.GET.keys()
-        return Fighter.objects.filter(country=self.get_country_code(), in_ufc=in_ufc)
+        return Fighter.objects.by_country(self.get_country_code()).filter(in_ufc=in_ufc)

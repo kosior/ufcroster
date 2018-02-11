@@ -20,6 +20,11 @@ class FighterQuerySet(QuerySet):
     def details(self):
         return self.select_related('record', 'urls')
 
+    def by_country(self, country_code):
+        return self.with_record().filter(
+            country=country_code
+        ).prefetch_related('images').only('slug', 'name', 'record__total')
+
     def get_by_sherdog_url(self, url):
         return self.get(urls__sherdog=url)
 
