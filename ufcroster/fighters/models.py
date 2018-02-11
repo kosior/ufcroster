@@ -98,6 +98,7 @@ class Fighter(TimeStampedModel):
 
 class FighterRecord(TimeStampedModel):
     fighter = models.OneToOneField(Fighter, related_name='record', on_delete=models.CASCADE)
+    total = models.CharField(max_length=48, blank=True, null=True, default=None)
 
     wins = models.IntegerField(blank=True, null=True, default=0)
     losses = models.IntegerField(blank=True, null=True, default=0)
@@ -117,8 +118,11 @@ class FighterRecord(TimeStampedModel):
     def __str__(self):
         return f'{self.fighter.name} {self.total}'
 
-    @property
-    def total(self):
+    def save(self, *args, **kwargs):
+        self.total = self.get_total()
+        super().save(*args, **kwargs)
+
+    def get_total(self):
         record = f'{self.wins} - {self.losses} - {self.draws}'
         if self.nc:
             record = f'{record} N/C: {self.nc} '
