@@ -81,7 +81,9 @@ class Fighter(TimeStampedModel):
 
     @property
     def last_5_results(self):
-        return self.fights.values_list('result', flat=True)[:6]
+        results = self.fights.filter(details__status=FightDetails.PAST,
+                                     details__type=FightDetails.PROFESSIONAL).values_list('result', flat=True)
+        return ','.join(results[:5])
 
     @property
     def main_image_url(self):
@@ -99,6 +101,7 @@ class Fighter(TimeStampedModel):
 class FighterRecord(TimeStampedModel):
     fighter = models.OneToOneField(Fighter, related_name='record', on_delete=models.CASCADE)
     total = models.CharField(max_length=48, blank=True, null=True, default=None)
+    last_5 = models.CharField(max_length=20, blank=True, default='')
 
     wins = models.IntegerField(blank=True, null=True, default=0)
     losses = models.IntegerField(blank=True, null=True, default=0)
@@ -120,7 +123,14 @@ class FighterRecord(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         self.total = self.get_total()
+        self.last_5 = self.fighter.last_5_results
         super().save(*args, **kwargs)
+
+    @property
+    def last_5_list(self):
+        if self.last_5:
+            return self.last_5.split(',')
+        return []
 
     def get_total(self):
         record = f'{self.wins} - {self.losses} - {self.draws}'
