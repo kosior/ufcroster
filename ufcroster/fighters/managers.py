@@ -33,7 +33,7 @@ class FighterQuerySet(QuerySet):
         FightDetails = get_fight_details_model()
         qs = Fight.objects.fight_with_relations().exclude(details__status=FightDetails.UPCOMING)
         prefetch = Prefetch('fights', queryset=qs, to_attr='fights_list')
-        return self.details().prefetch_related(prefetch)
+        return self.details().prefetch_related(prefetch, 'images')
 
 
 class FighterManager(Manager):
@@ -96,6 +96,9 @@ class FightDetailsManager(Manager):
 class FightManager(Manager):
     def fight_with_relations(self):
         return self.select_related(
+            'fighter',
+            'fighter__urls',
+            'fighter__record',
             'opponent',
             'opponent__urls',
             'details',
@@ -104,3 +107,9 @@ class FightManager(Manager):
 
     def full_fights(self, fighter):
         return self.fight_with_relations().filter(fighter=fighter)
+
+    def upcoming_by_country(self, country_code):
+        FightDetails = get_fight_details_model()
+        return self.fight_with_relations().filter(
+            details__status=FightDetails.UPCOMING, fighter__country=country_code
+        ).prefetch_related('fighter__images', 'opponent__images', 'fighter__fights')
