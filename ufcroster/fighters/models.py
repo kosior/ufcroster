@@ -53,6 +53,7 @@ class Fighter(TimeStampedModel):
     image = VersatileImageField(upload_to=fighter_images_directory_path, blank=True,
                                 placeholder_image=OnStoragePlaceholderImage(path='fighters/placeholder.png'))
 
+    ufc_id = models.PositiveIntegerField(blank=True, null=True, default=None)
     rank = models.IntegerField(blank=True, null=True)
     in_ufc = models.BooleanField(default=False)
     active = models.BooleanField(default=False)
