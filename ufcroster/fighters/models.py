@@ -13,6 +13,15 @@ from events.models import Event
 from .managers import FightDetailsManager, FightManager, FighterManagerWithQueryset
 
 
+def fighter_images_directory_path(instance, filename):
+    if isinstance(instance, Fighter):
+        fighter_id = instance.id
+    else:
+        fighter_id = instance.fighter_id
+
+    return f'fighters/{fighter_id}/{instance.id}{filename}'
+
+
 class Fighter(TimeStampedModel):
     FEMALE = 'F'
     MALE = 'M'
@@ -42,7 +51,8 @@ class Fighter(TimeStampedModel):
 
     team = models.CharField(_('Team'), max_length=50, blank=True)
 
-    image = models.ImageField(upload_to='fighters', blank=True)
+    image = VersatileImageField(upload_to=fighter_images_directory_path, blank=True,
+                                placeholder_image=OnStoragePlaceholderImage(path='fighters/placeholder.png'))
 
     rank = models.IntegerField(blank=True, null=True)
     in_ufc = models.BooleanField(default=False)
@@ -179,10 +189,6 @@ class FighterUrls(TimeStampedModel):
             url_ = getattr(self, field_name)
             if url_:
                 yield (url_, display)
-
-
-def fighter_images_directory_path(instance, filename):
-    return f'fighters/{instance.fighter_id}/{instance.id}{filename}'
 
 
 class FighterImage(TimeStampedModel):
