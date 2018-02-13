@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
@@ -94,13 +93,6 @@ class Fighter(TimeStampedModel):
         results = self.fights.filter(details__status=FightDetails.PAST,
                                      details__type=FightDetails.PROFESSIONAL).values_list('result', flat=True)
         return ','.join(results[:5])
-
-    @property
-    def main_image_url(self):
-        image = self.images.first()
-        if not image:
-            return settings.MEDIA_URL + 'fighters/placeholder.png'
-        return image.image.url
 
     def add_image(self, url):
         image = FighterImage(fighter=self)

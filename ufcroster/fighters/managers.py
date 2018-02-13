@@ -11,29 +11,17 @@ def get_fight_details_model():
 
 
 class FighterQuerySet(QuerySet):
-    def with_urls(self):
-        return self.select_related('urls')
-
-    def with_record(self):
-        return self.select_related('record')
-
     def details(self):
         return self.select_related('record', 'urls')
 
-    def by_country(self, country_code):
-        return self.with_record().filter(
-            country=country_code
-        ).prefetch_related('images').only('slug', 'name', 'record__total')
-
-    def get_by_sherdog_url(self, url):
-        return self.get(urls__sherdog=url)
-
     def full_fighter(self):
         Fight = get_fight_model()
-        FightDetails = get_fight_details_model()
-        qs = Fight.objects.fight_with_relations().exclude(details__status=FightDetails.UPCOMING)
+        qs = Fight.objects.fight_with_relations()
         prefetch = Prefetch('fights', queryset=qs, to_attr='fights_list')
-        return self.details().prefetch_related(prefetch, 'images')
+        return self.details().prefetch_related(prefetch)
+
+    def by_country(self, country_code):
+        return self.select_related('record').filter(country=country_code).only('slug', 'name', 'record__total', 'image')
 
 
 class FighterManager(Manager):
@@ -110,6 +98,4 @@ class FightManager(Manager):
 
     def upcoming_by_country(self, country_code):
         FightDetails = get_fight_details_model()
-        return self.fight_with_relations().filter(
-            details__status=FightDetails.UPCOMING, fighter__country=country_code
-        ).prefetch_related('fighter__images', 'opponent__images', 'fighter__fights')
+        return self.fight_with_relations().filter(details__status=FightDetails.UPCOMING, fighter__country=country_code)
