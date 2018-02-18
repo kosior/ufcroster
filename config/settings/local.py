@@ -39,3 +39,6 @@ else:
             'TIMEOUT': None,
         }
     }
+
+
+TEST_EMAIL = env.str('TEST_EMAIL', None)

@@ -9,7 +9,7 @@ APPS_DIR = ROOT_DIR.path('ufcroster')
 
 env = environ.Env()
 
-READ_DOT_ENV_FILE = env.bool('DJANGO_READ_DOT_ENV_FILE', default=False)
+READ_DOT_ENV_FILE = env.bool('DJANGO_READ_DOT_ENV_FILE', default=True)
 
 if READ_DOT_ENV_FILE:
     env_file = str(ROOT_DIR.path('.env'))
@@ -195,3 +195,8 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
+
+
+MAILGUN_SEND_URL = 'https://api.mailgun.net/v3/mg.ufcroster.com/messages'
+MAIL_FROM_NO_REPLY = 'UFC Roster <no-reply@ufcroster.com>'
+MAILGUN_KEY = env.str('MAILGUN_KEY', None)
