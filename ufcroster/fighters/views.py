@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.http import Http404
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, TemplateView
 
 from .models import Fighter, Fight, FightDetails
 
@@ -11,6 +11,10 @@ class CountryCodeMixin:
         if country_code in settings.COUNTRIES_URL_CODES:
             return country_code.upper()
         raise Http404
+
+
+class IndexView(TemplateView):
+    template_name = 'index.html'
 
 
 class FighterDetail(DetailView):
