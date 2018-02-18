@@ -5,6 +5,17 @@ import requests
 from django.core.files.base import ContentFile
 
 
+def get_json(url, timeout=2):
+    try:
+        response = requests.get(url, timeout=timeout)
+    except requests.exceptions.Timeout:
+        pass
+    else:
+        if response.status_code == 200:
+            return response.json()
+    return {}
+
+
 def restructure_fields_by_template(object_with_fields, template_dictionary):
 
     existing = set(object_with_fields.fields.keys())
@@ -55,11 +66,4 @@ def get_data_from_freegeoip(ip):
             }
     """
     url = f'https://freegeoip.net/json/{ip}'
-    try:
-        response = requests.get(url, timeout=2)
-    except requests.exceptions.Timeout:
-        pass
-    else:
-        if response.status_code == 200:
-            return response.json()
-    return {}
+    return get_json(url)
