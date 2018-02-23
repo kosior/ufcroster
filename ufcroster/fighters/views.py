@@ -2,7 +2,7 @@ from django.conf import settings
 from django.http import Http404
 from django.views.generic import DetailView, ListView, TemplateView
 
-from .models import Fighter, Fight, FightDetails
+from .models import Fighter, Fight
 
 
 class CountryCodeMixin:
@@ -28,7 +28,7 @@ class UpcomingFightsByCountry(CountryCodeMixin, ListView):
     template_name = 'fighters/upcoming_by_country.html'
 
     def get_queryset(self):
-        return Fight.objects.filter(details__status=FightDetails.UPCOMING, fighter__country=self.get_country_code())
+        return Fight.objects.upcoming_by_country(self.get_country_code()).order_by('details__date')
 
 
 class FightersByCountry(CountryCodeMixin, ListView):
