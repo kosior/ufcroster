@@ -1,5 +1,5 @@
 from django.apps import apps
-from django.db.models import Sum, Case, When, IntegerField, Prefetch, QuerySet, Manager
+from django.db.models import Prefetch, QuerySet, Manager
 
 
 def get_fight_model():
@@ -23,6 +23,9 @@ class FighterQuerySet(QuerySet):
     def by_country(self, country_code):
         return self.select_related('record').filter(country=country_code).only('slug', 'name', 'record__total', 'image')
 
+    def active(self):
+        return self.filter(in_ufc=True, active=True)
+
 
 class FighterManager(Manager):
     def create_full(self, **kwargs):
@@ -41,47 +44,23 @@ class FighterManager(Manager):
         except self.model.DoesNotExist:
             return self.create_full(**kwargs), True
 
-    def pro_record(self):
-        FightDetails = get_fight_details_model()
-        return self.fights.filter(details__type=FightDetails.PROFESSIONAL).aggregate(
-            wins=Sum(Case(When(result=self.model.WIN, then=1), output_field=IntegerField(), default=0)),
-            losses=Sum(Case(When(result=self.model.LOSS, then=1), output_field=IntegerField(), default=0)),
-            draws=Sum(Case(When(result=self.model.DRAW, then=1), output_field=IntegerField(), default=0)),
-            nc=Sum(Case(When(result=self.model.NOCONTEST, then=1), output_field=IntegerField(), default=0)),
-
-            wins_ko_tko=Sum(Case(When(details__method_type=FightDetails.KO_TKO, result=self.model.WIN, then=1),
-                                 output_field=IntegerField(), default=0)),
-            wins_sub=Sum(Case(When(details__method_type=FightDetails.SUBMISSION, result=self.model.WIN, then=1),
-                              output_field=IntegerField(), default=0)),
-            wins_dec=Sum(Case(When(details__method_type=FightDetails.DECISION, result=self.model.WIN, then=1),
-                              output_field=IntegerField(), default=0)),
-            wins_other=Sum(Case(When(details__method_type=FightDetails.OTHER, result=self.model.WIN, then=1),
-                                output_field=IntegerField(), default=0)),
-
-            losses_ko_tko=Sum(Case(When(details__method_type=FightDetails.KO_TKO, result=self.model.LOSS, then=1),
-                                   output_field=IntegerField(), default=0)),
-            losses_sub=Sum(Case(When(details__method_type=FightDetails.SUBMISSION, result=self.model.LOSS, then=1),
-                                output_field=IntegerField(), default=0)),
-            losses_dec=Sum(Case(When(details__method_type=FightDetails.DECISION, result=self.model.LOSS, then=1),
-                                output_field=IntegerField(), default=0)),
-            losses_other=Sum(Case(When(details__method_type=FightDetails.OTHER, result=self.model.LOSS, then=1),
-                                  output_field=IntegerField(), default=0)),
-
-            draws_f=Sum(Case(When(details__method_type=FightDetails.DRAW, then=1), output_field=IntegerField(),
-                             default=0)),
-
-            nc_f=Sum(Case(When(details__method_type=FightDetails.NC, then=1), output_field=IntegerField(), default=0)),
-        )
-
 
 FighterManagerWithQueryset = FighterManager.from_queryset(FighterQuerySet)
 
 
 class FightDetailsManager(Manager):
-    pass
+    def rest_get_or_create(self, fighter, **kwargs):
+        try:
+            details = self.get(**kwargs)
+        except self.model.DoesNotExist:
+            return self.create(**kwargs), True
+        else:
+            if details.fights.filter(opponent=fighter).exists():
+                return details, False
+            return self.create(**kwargs), True
 
 
-class FightManager(Manager):
+class FightQuerySet(QuerySet):
     def fight_with_relations(self):
         return self.select_related(
             'fighter',
@@ -93,9 +72,11 @@ class FightManager(Manager):
             'details__event',
         )
 
+    def upcoming(self):
+        return self.filter(details__status='U')
+
     def full_fights(self, fighter):
         return self.fight_with_relations().filter(fighter=fighter)
 
     def upcoming_by_country(self, country_code):
-        FightDetails = get_fight_details_model()
-        return self.fight_with_relations().filter(details__status=FightDetails.UPCOMING, fighter__country=country_code)
+        return self.fight_with_relations().upcoming().filter(fighter__country=country_code)

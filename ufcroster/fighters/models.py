@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum, Case, When, IntegerField
 from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
@@ -9,7 +10,7 @@ from versatileimagefield.placeholder import OnStoragePlaceholderImage
 from common.models import TimeStampedModel
 from common.utils import get_image_data
 from events.models import Event
-from .managers import FightDetailsManager, FightManager, FighterManagerWithQueryset
+from .managers import FightDetailsManager, FightQuerySet, FighterManagerWithQueryset
 
 
 def fighter_images_directory_path(instance, filename):
@@ -100,6 +101,38 @@ class Fighter(TimeStampedModel):
         image.image.save(*get_image_data(url), save=False)
         image.save()
 
+    def pro_record(self):
+        return self.fights.filter(details__type=FightDetails.PROFESSIONAL).aggregate(
+            wins=Sum(Case(When(result=Fight.WIN, then=1), output_field=IntegerField(), default=0)),
+            losses=Sum(Case(When(result=Fight.LOSS, then=1), output_field=IntegerField(), default=0)),
+            draws=Sum(Case(When(result=Fight.DRAW, then=1), output_field=IntegerField(), default=0)),
+            nc=Sum(Case(When(result=Fight.NOCONTEST, then=1), output_field=IntegerField(), default=0)),
+
+            wins_ko_tko=Sum(Case(When(details__method_type=FightDetails.KO_TKO, result=Fight.WIN, then=1),
+                                 output_field=IntegerField(), default=0)),
+            wins_sub=Sum(Case(When(details__method_type=FightDetails.SUBMISSION, result=Fight.WIN, then=1),
+                              output_field=IntegerField(), default=0)),
+            wins_dec=Sum(Case(When(details__method_type=FightDetails.DECISION, result=Fight.WIN, then=1),
+                              output_field=IntegerField(), default=0)),
+            wins_other=Sum(Case(When(details__method_type=FightDetails.OTHER, result=Fight.WIN, then=1),
+                                output_field=IntegerField(), default=0)),
+
+            losses_ko_tko=Sum(Case(When(details__method_type=FightDetails.KO_TKO, result=Fight.LOSS, then=1),
+                                   output_field=IntegerField(), default=0)),
+            losses_sub=Sum(Case(When(details__method_type=FightDetails.SUBMISSION, result=Fight.LOSS, then=1),
+                                output_field=IntegerField(), default=0)),
+            losses_dec=Sum(Case(When(details__method_type=FightDetails.DECISION, result=Fight.LOSS, then=1),
+                                output_field=IntegerField(), default=0)),
+            losses_other=Sum(Case(When(details__method_type=FightDetails.OTHER, result=Fight.LOSS, then=1),
+                                  output_field=IntegerField(), default=0)),
+
+            # draws_f=Sum(Case(When(details__method_type=FightDetails.DRAW, then=1), output_field=IntegerField(),
+            #                  default=0)),
+            #
+            # nc_f=Sum(Case(When(details__method_type=FightDetails.NC, then=1), output_field=IntegerField(),
+            #               default=0)),
+        )
+
 
 class FighterRecord(TimeStampedModel):
     fighter = models.OneToOneField(Fighter, related_name='record', on_delete=models.CASCADE)
@@ -148,6 +181,10 @@ class FighterRecord(TimeStampedModel):
         if self.wins == wins_sum and self.losses == losses_sum:
             return True
         return False
+
+    @property
+    def total_fights(self):
+        return self.wins + self.losses + self.draws + self.nc
 
 
 class FighterUrls(TimeStampedModel):
@@ -276,7 +313,7 @@ class Fight(TimeStampedModel):
     result = models.CharField(max_length=2, choices=RESULTS, blank=True)
     ordinal = models.IntegerField(blank=True, null=True)
 
-    objects = FightManager()
+    objects = FightQuerySet.as_manager()
 
     class Meta:
         unique_together = ('details', 'fighter', 'opponent')
@@ -284,6 +321,37 @@ class Fight(TimeStampedModel):
 
     def __str__(self):
         return f'{self.fighter.name} {self.get_result_display()} {self.opponent.name}'
+
+    def add_fight_to_record(self, method_type):
+        record = self.fighter.record
+        record_result_map = {self.WIN: 'wins', self.LOSS: 'losses', self.DRAW: 'draws', self.NOCONTEST: 'nc'}
+        record_method_map = {
+            self.LOSS: {
+                FightDetails.KO_TKO: 'losses_ko_tko',
+                FightDetails.SUBMISSION: 'losses_sub',
+                FightDetails.DECISION: 'losses_dec',
+                FightDetails.OTHER: 'losses_other'
+            },
+            self.WIN: {
+                FightDetails.KO_TKO: 'wins_ko_tko',
+                FightDetails.SUBMISSION: 'wins_sub',
+                FightDetails.DECISION: 'wins_dec',
+                FightDetails.OTHER: 'wins_other'
+            }
+        }
+
+        record_result_field = record_result_map.get(self.result)
+        record_method_field = record_method_map.get(self.result, {}).get(method_type)
+
+        if record_result_field:
+            result_count = getattr(record, record_result_field)
+            setattr(record, record_result_field, result_count + 1)
+
+        if record_method_field:
+            method_count = getattr(record, record_method_field)
+            setattr(record, record_method_field, method_count + 1)
+
+        record.save()
 
     @property
     def opponent_last_5_list(self):

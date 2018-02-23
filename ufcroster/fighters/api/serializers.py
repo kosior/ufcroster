@@ -1,9 +1,13 @@
+import logging
+
 from rest_framework import serializers
 
 from common.utils import restructure_fields_by_template
 from events.api.serializers import EventSerializer
 from events.models import Event
 from ..models import Fighter, FighterUrls, FighterRecord, Fight, FightDetails
+
+logger = logging.getLogger(__name__)
 
 
 class FieldsByTemplateMixin:
@@ -108,7 +112,7 @@ class FightSerializer(serializers.ModelSerializer):
 
         opponent, _ = Fighter.objects.rest_get_or_create(**opponent_data)
         event, _ = Event.objects.get_or_create(**event_data)
-        fight_details, _ = FightDetails.objects.get_or_create(event=event, **details_data)
+        fight_details, _ = FightDetails.objects.rest_get_or_create(fighter=fighter, event=event, **details_data)
 
         fight = Fight.objects.create(fighter=fighter, opponent=opponent, details=fight_details, **validated_data)
         return fight
@@ -126,3 +130,32 @@ class FightSerializer(serializers.ModelSerializer):
         if isinstance(validated_data, list):
             return self._bulk_create(fighter, validated_data)
         return self._single_create(fighter, validated_data)
+
+    def update(self, instance, validated_data):
+        details_data = validated_data.pop('details')
+        opponent_data = validated_data.pop('opponent')
+
+        fight_details = instance.details
+
+        if not instance.opponent.urls.sherdog == opponent_data['urls']['sherdog']:
+            logger.error(f'Fight update error (inconsistent opponent): (id: {instance.id}) {instance.fighter.slug}')
+            raise serializers.ValidationError('Inconsistent opponent data.')
+        if not fight_details.event.sherdog_url == details_data['event']['sherdog_url']:
+            logger.error(f'Fight update error (inconsistent event): (id: {instance.id}) {instance.fighter.slug}')
+            raise serializers.ValidationError('Inconsistent event data.')
+
+        instance.result = validated_data.get('result', instance.result)
+        instance.save()
+
+        if fight_details.status == FightDetails.UPCOMING and details_data['status'] == FightDetails.PAST:
+            instance.add_fight_to_record(method_type=details_data['method_type'])
+
+        fight_details.status = details_data['status']
+        fight_details.method = details_data['method']
+        fight_details.method_type = details_data['method_type']
+        fight_details.round = details_data['round']
+        fight_details.time = details_data['time']
+        fight_details.referee = details_data['referee']
+        fight_details.save()
+
+        return instance
