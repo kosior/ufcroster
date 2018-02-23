@@ -4,7 +4,8 @@ from .models import Fighter, FighterRecord, FighterUrls, FightDetails, Fight
 
 
 class FighterAdmin(admin.ModelAdmin):
-    list_display = ('name', 'active', 'in_ufc')
+    list_display = ('name', 'active', 'in_ufc', 'country', 'created')
+    list_filter = ('country',)
 
 
 class FighterRecordAdmin(admin.ModelAdmin):
@@ -16,13 +17,14 @@ class FighterUrlsAdmin(admin.ModelAdmin):
 
 
 class FightDetailsAdmin(admin.ModelAdmin):
-    list_display = ('date', 'type', 'status', 'event')
+    list_display = ('date', 'type', 'status', 'event', 'created', 'modified')
     list_select_related = ('event', )
 
 
 class FightAdmin(admin.ModelAdmin):
-    list_display = ('fighter', 'result', 'opponent')
+    list_display = ('fighter', 'result', 'opponent', 'created', 'modified')
     list_select_related = ('fighter', 'opponent', 'details')
+    search_fields = ('fighter__name', 'fighter__slug',)
 
 
 admin.site.register(Fighter, FighterAdmin)
