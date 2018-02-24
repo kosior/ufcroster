@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_countries.fields import CountryField
 from versatileimagefield.fields import VersatileImageField
 from versatileimagefield.placeholder import OnStoragePlaceholderImage
+from model_utils import FieldTracker
 
 from common.models import TimeStampedModel
 from common.utils import get_image_data
@@ -277,6 +278,8 @@ class FightDetails(TimeStampedModel):
     referee = models.CharField(max_length=255, blank=True)
     ordinal = models.IntegerField(blank=True, null=True, default=None)
 
+    tracker = FieldTracker(fields=['event', 'status', 'date'])
+
     objects = FightDetailsManager()
 
     class Meta:
@@ -312,6 +315,8 @@ class Fight(TimeStampedModel):
     opponent_record_before = models.CharField(max_length=20, blank=True)
     result = models.CharField(max_length=2, choices=RESULTS, blank=True)
     ordinal = models.IntegerField(blank=True, null=True)
+
+    tracker = FieldTracker(fields=['opponent', 'result'])
 
     objects = FightQuerySet.as_manager()
 
