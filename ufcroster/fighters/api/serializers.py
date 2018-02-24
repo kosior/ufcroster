@@ -134,28 +134,29 @@ class FightSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         details_data = validated_data.pop('details')
         opponent_data = validated_data.pop('opponent')
-
-        fight_details = instance.details
+        event_data = details_data.pop('event')
 
         if not instance.opponent.urls.sherdog == opponent_data['urls']['sherdog']:
-            logger.error(f'Fight update error (inconsistent opponent): (id: {instance.id}) {instance.fighter.slug}')
-            raise serializers.ValidationError('Inconsistent opponent data.')
-        if not fight_details.event.sherdog_url == details_data['event']['sherdog_url']:
-            logger.error(f'Fight update error (inconsistent event): (id: {instance.id}) {instance.fighter.slug}')
-            raise serializers.ValidationError('Inconsistent event data.')
+            logger.warning(f'Fight update warning (different opponent): (id: {instance.id}) {instance.fighter.slug}')
+            new_opponent, _ = Fighter.objects.rest_get_or_create(**opponent_data)
+            instance.opponent = new_opponent
 
         instance.result = validated_data.get('result', instance.result)
         instance.save()
 
+        fight_details = instance.details
+
+        if not fight_details.event.sherdog_url == event_data['sherdog_url']:
+            logger.warning(f'Fight update warning (different event): (id: {instance.id}) {instance.fighter.slug}')
+            new_event, _ = Event.objects.get_or_create(**event_data)
+            fight_details.event = new_event
+
         if fight_details.status == FightDetails.UPCOMING and details_data['status'] == FightDetails.PAST:
             instance.add_fight_to_record(method_type=details_data['method_type'])
 
-        fight_details.status = details_data['status']
-        fight_details.method = details_data['method']
-        fight_details.method_type = details_data['method_type']
-        fight_details.round = details_data['round']
-        fight_details.time = details_data['time']
-        fight_details.referee = details_data['referee']
+        for key, value in details_data.items():
+            setattr(fight_details, key, value)
+
         fight_details.save()
 
         return instance
