@@ -135,6 +135,10 @@ logging.config.dictConfig({
             'handlers': ['console'],
             'level': 'DEBUG',
         },
+        'fighters': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
     },
 })
 
