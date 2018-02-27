@@ -2,7 +2,9 @@ import os
 from urllib.parse import urlparse
 
 import requests
+from django.conf import settings
 from django.core.files.base import ContentFile
+from django.template.loader import render_to_string
 
 
 def get_json(url, timeout=2):
@@ -67,3 +69,27 @@ def get_data_from_freegeoip(ip):
     """
     url = f'https://freegeoip.net/json/{ip}'
     return get_json(url)
+
+
+def send_email(to, subject, text='', template_name=None, context=None):
+    data = {
+        'from': settings.MAIL_FROM_NO_REPLY,
+        'to': to,
+        'subject': subject,
+        'text': text,
+    }
+
+    if template_name:
+        data['html'] = render_to_string(template_name, context)
+
+    if isinstance(to, list):
+        data['recipient-variables'] = '{}'
+
+    response = requests.post(settings.MAILGUN_SEND_URL, auth=('api', settings.MAILGUN_KEY), data=data)
+
+    if response.status_code == 200:
+        try:
+            return response.json()
+        except ValueError:
+            pass
+    return {}
