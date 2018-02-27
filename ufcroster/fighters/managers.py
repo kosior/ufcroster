@@ -75,6 +75,9 @@ class FightQuerySet(QuerySet):
     def upcoming(self):
         return self.filter(details__status='U')
 
+    def past(self):
+        return self.filter(details__status='P')
+
     def full_fights(self, fighter):
         return self.fight_with_relations().filter(fighter=fighter)
 

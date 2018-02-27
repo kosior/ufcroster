@@ -4,9 +4,9 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_countries.fields import CountryField
+from model_utils import FieldTracker
 from versatileimagefield.fields import VersatileImageField
 from versatileimagefield.placeholder import OnStoragePlaceholderImage
-from model_utils import FieldTracker
 
 from common.models import TimeStampedModel
 from common.utils import get_image_data
@@ -363,3 +363,10 @@ class Fight(TimeStampedModel):
         if self.opponent_last_5:
             return self.opponent_last_5.split(',')
         return []
+
+    @property
+    def was_previously_upcoming(self):
+        previous_status = self.details.tracker.previous('status')
+        if previous_status == FightDetails.UPCOMING and self.details.status == FightDetails.PAST:
+            return True
+        return False
