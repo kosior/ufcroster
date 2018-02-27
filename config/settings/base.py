@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'users',
     'fighters',
     'events',
+    'subscriptions',
 ]
 
 SITE_ID = 1
