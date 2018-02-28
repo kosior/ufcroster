@@ -3,7 +3,7 @@ from celery.task import task
 from celery.utils.log import get_task_logger
 from django.utils.timezone import now
 
-from common.sherdog.scrapper import SherdogScrapper
+from common.sherdog.scraper import SherdogScraper
 from fighters.api.serializers import FightSerializer
 from subscriptions.tasks import send_upcoming_email_notification, send_results_email_notification
 from .models import Fight, Fighter
@@ -14,7 +14,7 @@ logger = get_task_logger(__name__)
 
 @task
 def check_fighter_for_upcoming(slug, sherdog_url):
-    sherdog = SherdogScrapper(sherdog_url)
+    sherdog = SherdogScraper(sherdog_url)
     upcoming_data = sherdog.upcoming()
     if upcoming_data:
         upcoming = FightSerializer(data=upcoming_data, context={'slug': slug})
