@@ -84,8 +84,6 @@ class Fighter(TimeStampedModel):
         FighterRecord.objects.create(fighter=self, **record)
 
     def get_fight_ordinal(self, fight_details):
-        if fight_details.status == FightDetails.UPCOMING:
-            return self.fights.filter(details__type=FightDetails.PROFESSIONAL).count() + 1
         return self.fights.filter(details=fight_details).values_list('ordinal', flat=True).first()
 
     def upcoming_fight(self):
@@ -101,6 +99,9 @@ class Fighter(TimeStampedModel):
         image = FighterImage(fighter=self)
         image.image.save(*get_image_data(url), save=False)
         image.save()
+
+    def pro_fights_count(self):
+        return self.fights.filter(details__type=FightDetails.PROFESSIONAL).count()
 
     def pro_record(self):
         return self.fights.filter(details__type=FightDetails.PROFESSIONAL).aggregate(
