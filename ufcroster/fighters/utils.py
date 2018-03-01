@@ -44,7 +44,7 @@ def create_or_update_fighter(sherdog_url, in_ufc=False, active=False):
 def set_opponent_info(fight):
     details = fight.details
     opponent = fight.opponent
-    opponent_fight_ordinal = opponent.get_fight_ordinal(fight_details=details)
+    opponent_fight_ordinal = opponent.get_fight_ordinal(fight=fight)
 
     if not opponent_fight_ordinal:
         opponent_sherdog_url = opponent.urls.sherdog
@@ -59,7 +59,7 @@ def set_opponent_info(fight):
                 except IntegrityError:
                     logger.error(f'Error when saving fight ({opponent.slug})')
 
-        opponent_fight_ordinal = opponent.get_fight_ordinal(fight_details=details)
+        opponent_fight_ordinal = opponent.get_fight_ordinal(fight=fight, is_db_updated=True)
 
     if not opponent_fight_ordinal:
         logger.error(f'Error setting opponent info')
@@ -83,8 +83,8 @@ def set_opponent_info(fight):
 
     fight.opponent_last_5 = ','.join(opponent_last_5)
     fight.opponent_record_before = dict_record_to_str(opponent_record_before)
-
-    return fight.save()
+    fight.save()
+    return fight
 
 
 def dict_record_to_str(record_dict):
@@ -106,7 +106,7 @@ def update_fighter_fights(fighter):
 
 
 def update_upcoming_fight(upcoming_fight):
-    assert upcoming_fight.details.status == FightDetails.UPCOMING
+    assert upcoming_fight.is_upcoming()
     sherdog_url = upcoming_fight.fighter.urls.sherdog
     scraper = SherdogScraper(sherdog_url)
     fight_data = scraper.fight(ordinal=upcoming_fight.ordinal)

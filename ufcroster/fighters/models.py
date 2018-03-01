@@ -83,8 +83,10 @@ class Fighter(TimeStampedModel):
     def create_record(self, **record):
         FighterRecord.objects.create(fighter=self, **record)
 
-    def get_fight_ordinal(self, fight_details):
-        return self.fights.filter(details=fight_details).values_list('ordinal', flat=True).first()
+    def get_fight_ordinal(self, fight, is_db_updated=False):
+        if is_db_updated and fight.is_upcoming():
+            return self.fights.filter(details__type=FightDetails.PROFESSIONAL).count() + 1
+        return self.fights.filter(details=fight.details).values_list('ordinal', flat=True).first()
 
     def upcoming_fight(self):
         return self.fights.fight_with_relations().filter(details__status=FightDetails.UPCOMING).first()
@@ -368,6 +370,12 @@ class Fight(TimeStampedModel):
     @property
     def was_previously_upcoming(self):
         previous_status = self.details.tracker.previous('status')
-        if previous_status == FightDetails.UPCOMING and self.details.status == FightDetails.PAST:
+        if previous_status == FightDetails.UPCOMING and self.is_past():
             return True
         return False
+
+    def is_upcoming(self):
+        return self.details.status == FightDetails.UPCOMING
+
+    def is_past(self):
+        return self.details.status == FightDetails.PAST
