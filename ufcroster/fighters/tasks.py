@@ -7,9 +7,14 @@ from common.sherdog.scraper import SherdogScraper
 from fighters.api.serializers import FightSerializer
 from subscriptions.tasks import send_upcoming_email_notification, send_results_email_notification
 from .models import Fight, Fighter
-from .utils import update_upcoming_fight
+from .utils import update_upcoming_fight, set_opponent_info
 
 logger = get_task_logger(__name__)
+
+
+@task
+def set_opponent_info_task(fight):
+    set_opponent_info(fight)
 
 
 @task
@@ -20,6 +25,7 @@ def check_fighter_for_upcoming(slug, sherdog_url):
         upcoming = FightSerializer(data=upcoming_data, context={'slug': slug})
         if upcoming.is_valid():
             fight = upcoming.save()
+            set_opponent_info_task.delay(fight)
             return fight.id
 
 
