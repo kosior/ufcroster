@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_countries',
     'versatileimagefield',
+    'raven.contrib.django.raven_compat',
     'common',
     'users',
     'fighters',
@@ -127,17 +128,22 @@ logging.config.dictConfig({
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
+        'sentry': {
+            'level': 'WARNING',
+            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+            'tags': {'custom-tag': 'x'},
+        },
         'console': {
             'class': 'logging.StreamHandler',
         },
     },
     'loggers': {
         'common': {
-            'handlers': ['console'],
+            'handlers': ['console', 'sentry'],
             'level': 'DEBUG',
         },
         'fighters': {
-            'handlers': ['console'],
+            'handlers': ['console', 'sentry'],
             'level': 'DEBUG',
         },
     },
@@ -205,3 +211,8 @@ CELERY_TIMEZONE = TIME_ZONE
 MAILGUN_SEND_URL = 'https://api.mailgun.net/v3/mg.ufcroster.com/messages'
 MAIL_FROM_NO_REPLY = 'UFC Roster <no-reply@ufcroster.com>'
 MAILGUN_KEY = env.str('MAILGUN_KEY', None)
+
+
+RAVEN_CONFIG = {
+    'dsn': env.str('SENTRY_DSN', None),
+}
