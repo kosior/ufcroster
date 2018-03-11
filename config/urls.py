@@ -13,6 +13,7 @@ api_patterns = [
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(api_patterns, namespace='api')),
+    url(r'subscription/', include('subscriptions.urls')),
     url(r'', include('fighters.urls')),
 ]
 

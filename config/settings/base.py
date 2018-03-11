@@ -3,6 +3,7 @@ import os
 import socket
 
 import environ
+from django.contrib import messages
 
 ROOT_DIR = environ.Path(__file__) - 3
 APPS_DIR = ROOT_DIR.path('ufcroster')
@@ -16,6 +17,8 @@ if READ_DOT_ENV_FILE:
     env.read_env(env_file)
 
 DEBUG = env.bool('DJANGO_DEBUG', False)
+
+SITE_URL = 'https://www.ufcroster.com'
 
 INTERNAL_IPS = []
 
@@ -88,6 +91,14 @@ TEMPLATES = [
     },
 ]
 
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
+
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
@@ -122,7 +133,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-LOGGING_CONFIG = None
+# LOGGING_CONFIG = None
 
 logging.config.dictConfig({
     'version': 1,
