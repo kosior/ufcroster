@@ -1,11 +1,13 @@
 import logging
 
+from django.core.cache import cache
+from django.core.cache.utils import make_template_fragment_key
 from django.db.models import Sum, Case, When, IntegerField
 from django.db.utils import IntegrityError
 
 from common.sherdog.scraper import SherdogScraper
 from .api.serializers import FightSerializer, FighterSerializer
-from .models import Fighter, Fight, FightDetails
+from .models import Fighter, Fight
 
 logger = logging.getLogger(__name__)
 
@@ -113,3 +115,8 @@ def update_upcoming_fight(upcoming_fight):
     fight = FightSerializer(instance=upcoming_fight, data=fight_data)
     if fight.is_valid():
         return fight.save()
+
+
+def invalidate_fights_cache(fighter_ids):
+    keys = [make_template_fragment_key('fights', vary_on=[id_]) for id_ in fighter_ids]
+    cache.delete_many(keys)

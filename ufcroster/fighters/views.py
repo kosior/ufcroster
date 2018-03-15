@@ -19,8 +19,13 @@ class IndexView(TemplateView):
 
 class FighterDetail(DetailView):
     model = Fighter
-    queryset = Fighter.objects.full_fighter()
+    queryset = Fighter.objects.details()
     context_object_name = 'fighter'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['fights_list'] = Fight.objects.fight_with_relations().filter(fighter=self.object)
+        return context
 
 
 class UpcomingFightsByCountry(CountryCodeMixin, ListView):
@@ -36,5 +41,5 @@ class FightersByCountry(CountryCodeMixin, ListView):
     template_name = 'fighters/fighters.html'
 
     def get_queryset(self):
-        in_ufc = 'released' not in self.request.GET.keys()
+        in_ufc = 'released_retired' not in self.request.GET.keys()
         return Fighter.objects.by_country(self.get_country_code()).filter(in_ufc=in_ufc)
