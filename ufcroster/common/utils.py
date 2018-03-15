@@ -71,7 +71,7 @@ def get_data_from_freegeoip(ip):
     return get_json(url)
 
 
-def send_email(to, subject, text='', template_name=None, context=None):
+def send_email(to, subject, text='', template_name=None, context=None, recipient_vars=None):
     data = {
         'from': settings.MAIL_FROM_NO_REPLY,
         'to': to,
@@ -83,7 +83,7 @@ def send_email(to, subject, text='', template_name=None, context=None):
         data['html'] = render_to_string(template_name, context)
 
     if isinstance(to, list):
-        data['recipient-variables'] = '{}'
+        data['recipient-variables'] = recipient_vars or '{}'
 
     response = requests.post(settings.MAILGUN_SEND_URL, auth=('api', settings.MAILGUN_KEY), data=data)
 

@@ -3,7 +3,7 @@ from django.db import models
 from django.shortcuts import reverse
 from model_utils.models import TimeStampedModel
 
-from .managers import NotificationManager
+from .managers import NotificationManager, SubscriptionsManager
 
 
 class Notification(TimeStampedModel):
@@ -26,6 +26,8 @@ class Subscription(TimeStampedModel):
     token = models.CharField(max_length=256, unique=True)
     is_active = models.BooleanField(default=False)
 
+    objects = SubscriptionsManager()
+
     def __str__(self):
         return f'{self.email} Active: {self.is_active}'
 
@@ -38,3 +40,7 @@ class Subscription(TimeStampedModel):
             else:
                 part_url = reverse('subscriptions:deactivate')
                 return f'{settings.SITE_URL}{part_url}?token={self.token}'
+
+    @property
+    def unsubscribe_dict(self):
+        return {'unsubscribe': self.action_link}
