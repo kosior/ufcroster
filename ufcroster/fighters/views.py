@@ -7,14 +7,23 @@ from .models import Fighter, Fight
 
 class CountryCodeMixin:
     def get_country_code(self):
-        country_code = self.kwargs.get('country_code', '')
+        country_code = self.kwargs.get('country_code', '').upper()
         if country_code in settings.COUNTRIES_URL_CODES:
-            return country_code.upper()
+            return country_code
         raise Http404
 
 
 class IndexView(TemplateView):
     template_name = 'index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        fights_qs = Fight.objects.upcoming().fight_with_relations()
+        context['closest_fights'] = fights_qs.order_by('details__date')[:5]
+        context['recently_added_fights'] = fights_qs.order_by('-created')[:5]
+        context['recently_created_fighters'] = Fighter.objects.details().active().order_by('-created')[:5]
+        return context
 
 
 class FighterDetail(DetailView):
