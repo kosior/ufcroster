@@ -1,0 +1,171 @@
+html {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding-top: 4.5rem;
+    background-color: #DDDDDD;
+}
+
+.container-fluid {
+    flex: 1;
+}
+
+footer {
+    background-color: #2C3E50;
+    padding: 5px;
+}
+
+.navbar {
+    height: 60px;
+}
+
+.navbar-brand {
+    width: 150px;
+}
+
+.logo-icon {
+    text-align: center;
+    width: 100%;
+}
+
+.brand-text {
+    float: left;
+    height: 40px;
+    line-height: 40px;
+}
+
+.flag-menu {
+    font-size: 20px;
+}
+
+.rounded-corners {
+    border-radius: 5px;
+}
+
+.icon-size {
+    font-size: 20px !important;
+}
+
+.bg-lightt {
+    background-color: white !important;
+}
+
+.btn-f-url {
+    min-width: 90px;
+}
+
+.table td {
+    border: #8d9dad solid 1px !important;
+}
+
+.table th {
+    border: #8d9dad solid 1px !important;
+}
+
+.result-badge {
+    float: left;
+    padding: 0.25em 0.4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0;
+}
+
+.list-group li {
+    border-color: white;
+}
+
+.brr {
+    border: solid 1px wheat;
+}
+
+.octagonWrap {
+    width: 40px;
+    height: 40px;
+    float: left;
+    position: relative;
+    overflow: hidden;
+}
+
+.octagon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    transform: rotate(45deg);
+    background: transparent;
+    border: 5px solid white;
+}
+
+.octagon:before {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    bottom: -5px;
+    left: -5px;
+    transform: rotate(45deg);
+    content: '';
+    border: inherit;
+}
+
+.center {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+    height: 15px;
+    width: 100%;
+    border-radius: 5px;
+
+}
+
+.centerIcon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+    width: 100%;
+}
+
+.navbar .btn-outline-info {
+    border-color: white !important;
+    color: white !important;
+}
+
+.flag-logo {
+    position: absolute;
+    top: 12px;
+    left: 180px;
+    transform: rotate(30deg);
+    font-size: 15px;
+}
+
+.word-wrap {
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.ur-shadow {
+    box-shadow: 0 4px 6px 0 hsla(0, 0%, 0%, 0.2);
+}
+
+.card-bg {
+    background-color: hsla(210, 9%, 96%);
+}
+
+.ur-bt {
+    border-top: 6px solid #2C3E50;
+}
+
+.ur-border-w {
+    border-width: 3px !important;
+}

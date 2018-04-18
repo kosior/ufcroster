@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container-fluid">
+    <div class="alert alert-danger">
+      Site is currently under development.
+    </div>
+
+    <div class="row justify-content-center mb-4">
+      <div class="col-lg-6">
+        <div class="card ur-shadow">
+          <div id="subscribeContent" class="card-body text-center">
+            <form id="subscriptionForm" action="{% url 'subscriptions:subscribe' %}" method="POST" class="form-inline justify-content-center">
+              {% csrf_token %}
+              <div class="form-group mr-2">
+                <input type="email" class="form-control" name="email" placeholder="Enter email">
+              </div>
+              <button type="submit" class="btn btn-primary">Subscribe</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-3 col-12 text-center px-5">
+        <h6 class="font-weight-bold">Closest fights</h6>
+        <hr>
+        {% for fight in closest_fights %}
+          {% include 'fighters/snippets/fight_card.html' with fight=fight %}
+        {% endfor%}
+      </div>
+      <div class="col-lg-3 col-12 text-center px-5">
+        <h6 class="font-weight-bold">Recently added fights</h6>
+        <hr>
+        {% for fight in recently_added_fights %}
+          {% include 'fighters/snippets/fight_card.html' with fight=fight %}
+        {% endfor%}
+      </div>
+      <div class="col-lg-3 col-12 text-center px-5">
+        <h6 class="font-weight-bold">Recently added fighters</h6>
+        <hr>
+        {% for fighter in recently_created_fighters %}
+          {% include 'fighters/snippets/fighter_index_card.html' with fighter=fighter %}
+        {% endfor%}
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block js %}
+  <script>
+    var form = $('#subscriptionForm');
+    form.submit(function (event) {
+      event.preventDefault();
+      $.post(form.attr('action'), form.serialize(), function (data) {
+        $('#subscribeContent').html(data.msg);
+      });
+    });
+  </script>
+{% endblock js %}

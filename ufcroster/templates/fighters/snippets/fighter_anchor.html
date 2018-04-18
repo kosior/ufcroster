@@ -1,0 +1,7 @@
+{% if fighter.active %}
+  <a class="text-primary" href="{% url 'fighters:detail' fighter.slug %}">{{ fighter.name }}</a>
+{% else %}
+  <a class="text-primary" href="{{ fighter.urls.sherdog }}" target="_blank">
+    {{ fighter.name }} <i class="fa fa-external-link-square" aria-hidden="true"></i>
+  </a>
+{% endif %}

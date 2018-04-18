@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block title %}
+  Upcoming
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-2">
+    {% for fight in fights %}
+      <div class="card mb-3 ur-shadow">
+        <div class="card-header p-0 text-center">{{ fight.details.date }}</div>
+        <div class="card-body p-1">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="row text-center">
+                <div class="col-lg-2">
+                  <a href="{% url 'fighters:detail' fight.fighter.slug %}">
+                    <img style="height: 100px;" class="img-fluid rounded" src="{{ fight.fighter.image.url }}" alt="">
+                  </a>
+                </div>
+                <div class="col-lg-3">
+                  <div class="row">
+                    <div class="col-lg-12 h5">
+                      <a class="font-weight-bold text-primary" href="{% url 'fighters:detail' fight.fighter.slug %}">
+                        {{ fight.fighter.name }}
+                      </a>
+                    </div>
+                    <div class="col-lg-12 h6">{{ fight.fighter.record.total }}</div>
+                    <div class="col-lg-12 h6">
+                      {% include 'fighters/snippets/fighter_last_5.html' with last_5_results=fight.fighter.record.last_5_list show_description=True %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-2 d-flex align-items-center justify-content-center">vs.</div>
+                <div class="col-lg-3">
+                  <div class="row">
+                    <div class="col-lg-12 h5 font-weight-bold">
+                      {% include 'fighters/snippets/fighter_anchor.html' with fighter=fight.opponent %}
+                    </div>
+                    <div class="col-lg-12 h6">{{ fight.opponent_record_before }}</div>
+                    <div class="col-lg-12 h6">
+                      {% include 'fighters/snippets/fighter_last_5.html' with last_5_results=fight.opponent_last_5_list show_description=True %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-2">
+                  <img style="height: 100px;" class="img-fluid rounded" src="{{ fight.opponent.image.url }}" alt="">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer p-0 text-center">{{ fight.details.event }}</div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

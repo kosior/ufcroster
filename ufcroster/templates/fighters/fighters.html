@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block title %}
+  Fighters
+{% endblock %}
+
+{% block content %}
+  <div class="container-fluid my-1">
+    <div class="row">
+      <div class="col">
+        {% if request.GET.released_retired is None %}
+          <a href="{% url 'fighters:by_country' view.kwargs.country_code %}?released_retired" class="btn btn-primary pull-right">Released or retired</a>
+        {% else %}
+          <a href="{% url 'fighters:by_country' view.kwargs.country_code %}" class="btn btn-primary pull-right">Currently in UFC</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-center flex-wrap">
+      {% for fighter in fighters %}
+        {% include 'fighters/snippets/fighter_card.html' with fighter=fighter %}
+      {% empty %}
+        Fighters not found.
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

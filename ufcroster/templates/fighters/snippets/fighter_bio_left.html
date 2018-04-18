@@ -1,0 +1,46 @@
+{% load staticfiles %}
+
+<div class="card ur-shadow">
+    <div class="card-header text-center">
+        <h3>{{ fighter.name }}</h3>
+        <div>{{ fighter.record.total }}</div>
+    </div>
+
+    <div class="text-center">
+        <img class="card-img rounded-0 img-fluid" style="max-width: 250px;"
+             src="{{ fighter.image.url }}" alt="fighter">
+    </div>
+
+    <div class="card-body px-1">
+        <div class="row">
+            {% if fighter.nickname %}
+                <div class="col-lg-5 col-md-3 col-6 text-right">Nickname:</div>
+                <div class="col-lg-7 col-md-3 col-6 text-left font-weight-bold">{{ fighter.nickname }}</div>
+            {% endif %}
+
+            <div class="col-lg-5 col-md-3 col-6 text-right">Brithdate:</div>
+            <div class="col-lg-7 col-md-3 col-6 text-left font-weight-bold">{{ fighter.birthdate }}</div>
+
+            <div class="col-lg-5 col-md-3 col-6 text-right">Brithplace:</div>
+            <div class="col-lg-7 col-md-3 col-6 text-left font-weight-bold">{{ fighter.birthplace }}</div>
+
+            <div class="col-lg-5 col-md-3 col-6 text-right">Country:</div>
+            <div class="col-lg-7 col-md-3 col-6 text-left font-weight-bold">{{ fighter.country.name }} <i class="{{ fighter.country.flag_css }}"></i></div>
+
+            <div class="col-lg-5 col-md-3 col-6 text-right">Height:</div>
+            <div class="col-lg-7 col-md-3 col-6 text-left font-weight-bold">{{ fighter.height }} cm ({{ fighter.height_imp }})</div>
+
+            <div class="col-lg-5 col-md-3 col-6 text-right">Weight:</div>
+            <div class="col-lg-7 col-md-3 col-6 text-left font-weight-bold">{{ fighter.weight }} kg ({{ fighter.weight_imp }})</div>
+
+            <div class="col-lg-5 col-md-3 col-6 text-right">Weight class:</div>
+            <div class="col-lg-7 col-md-3 col-6 text-left font-weight-bold">{{ fighter.weight_class }}</div>
+
+            <div class="col-lg-5 col-md-3 col-6 text-right">Reach:</div>
+            <div class="col-lg-7 col-md-3 col-6 text-left font-weight-bold">{{ fighter.reach }}</div>
+
+            <div class="col-lg-5 col-md-3 col-6 text-right">Team:</div>
+            <div class="col-lg-7 col-md-3 col-6 text-left font-weight-bold">{{ fighter.team }}</div>
+        </div>
+    </div>
+</div>

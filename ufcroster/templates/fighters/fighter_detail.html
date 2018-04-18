@@ -1,6 +1,29 @@
-<div>{{ fighter.name }}</div>
-<div>{{ fighter.urls.ufc }}</div>
-<div>{{ fighter.get_absolute_url }}</div>
-{% if fighter.image %}
-    <div><img src="{{ fighter.image.url }}"></div>
-{% endif %}
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% load cache %}
+
+{% block title %}
+    {{ fighter.name }}
+{% endblock %}
+
+{% block content %}
+
+    {% include 'fighters/snippets/fighter_urls.html' %}
+    <div class="container-fluid my-1">
+        <div class="row">
+            <div class="col-lg-3 col-md-12">
+                {% include 'fighters/snippets/fighter_bio_left.html' %}
+            </div>
+            <div class="col-lg-9 col-md-12">
+                <div class="card ur-shadow">
+                    {% include 'fighters/snippets/fighter_record.html' %}
+                </div>
+                {% cache 86400 fights fighter.id %}
+                  {% include 'fighters/snippets/fighter_fights.html' %}
+                {% endcache %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

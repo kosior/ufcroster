@@ -1,0 +1,43 @@
+{% load active_countries %}
+
+{% get_active_countries as countries %}
+
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary px-5">
+  <a class="navbar-brand" href="{% url 'fighters:index' %}">
+    <div class='octagonWrap'>
+      <div class='octagon text-center'></div>
+      <div class="centerIcon"><i class="fa fa-globe logo-icon" aria-hidden="true"></i></div>
+    </div>
+    <div class="ml-1 brand-text">UFC Roster</div>
+    <div class="flag-logo flag-icon flag-icon-{{ view.kwargs.country_code }}"></div>
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarH"
+          aria-controls="navbarH" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarH">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'fighters:index' %}">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+           aria-haspopup="true" aria-expanded="false">
+          Countries
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          {% for country in countries %}
+            <div class="p-2 d-flex align-items-center">
+              <span class="flag-icon flag-icon-{{ country|lower }} mx-2 flag-menu"></span>
+              <span class="mr-auto">{{ country.name }}</span>
+              <a href="{% url 'fighters:by_country' country|lower %}" class="btn btn-sm btn-primary mx-2">Fighters</a>
+              <a href="{% url 'fighters:upcoming_by_country' country|lower %}"
+                 class="btn btn-sm btn-primary float-right">Upcoming fights</a>
+            </div>
+          {% endfor %}
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>

@@ -1,0 +1,78 @@
+{% load fighter_tags %}
+
+{% for fight in fights_list %}
+  {% if fight.details.status == 'U' %}
+    {% include 'fighters/snippets/fighter_upcoming.html' with upcoming_fight=fight %}
+  {% else %}
+    {% ifchanged fight.details.type %}
+      <div class="card my-3 px-3 ur-shadow">
+        <div class="card-header p-0">
+          <div class="text-center font-weight-bold h3 m-0">{{ fight.details.get_type_display }} Fights</div>
+        </div>
+        <div class="container-fluid d-none d-lg-block">
+          <div class="row">
+            <div class="col-lg-1 text-center p-0">Date</div>
+            <div class="col-lg-1 text-center p-0">Result</div>
+            <div class="col-lg-2 text-center p-0">Opponent</div>
+            <div class="col-lg-2 text-center p-0">Opponent last 5<br>
+              <small class="">latest to oldest</small>
+            </div>
+            <div class="col-lg-2 text-center p-0">Opponent record before</div>
+            <div class="col-lg-2 text-center p-0">Method</div>
+            <div class="col-lg-1 text-center p-0">Round</div>
+            <div class="col-lg-1 text-center p-0">Time</div>
+          </div>
+        </div>
+      </div>
+
+    {% endifchanged %}
+
+    <div class="card border-{% result_badge fight.result %} mb-2 mx-3 ur-shadow" style="font-size: 13px; border-width: 3px;">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-3 d-lg-none text-right p-0">Date:</div>
+          <div class="col-lg-1 col-9 text-center p-0 align-self-center">
+            {{ fight.details.date|date:'SHORT_DATE_FORMAT' }}
+          </div>
+
+          <div class="col-3 d-lg-none text-right p-0">Result:</div>
+          <div class="col-lg-1 col-9 text-center p-0 align-self-center">
+            <h6 class="m-0">
+              <span class="badge badge-pill badge-{% result_badge fight.result %}">
+                {{ fight.get_result_display }}
+              </span>
+            </h6>
+          </div>
+
+          <div class="col-3 d-lg-none text-right p-0">Opponent:</div>
+          <div class="col-lg-2 col-9 text-center p-0 align-self-center font-weight-bold">
+            {% include 'fighters/snippets/fighter_anchor.html' with fighter=fight.opponent %}
+          </div>
+
+          <div class="col-3 d-lg-none text-right p-0">Opponent last 5:</div>
+          <div class="col-lg-2 col-9 text-center p-0 align-self-center">
+            {% include 'fighters/snippets/fighter_last_5.html' with last_5_results=fight.opponent_last_5_list %}
+          </div>
+
+          <div class="col-3 d-lg-none text-right p-0">Opponent record before:</div>
+          <div class="col-lg-2 col-9 text-center p-0 align-self-center">
+            {{ fight.opponent_record_before|default:'-' }}
+          </div>
+
+          <div class="col-3 d-lg-none text-right p-0">Method:</div>
+          <div class="col-lg-2 col-9 text-center p-0 align-self-center">
+            {{ fight.details.method_display|linebreaksbr }}
+          </div>
+
+          <div class="col-3 d-lg-none text-right p-0">Round:</div>
+          <div class="col-lg-1 col-9 text-center p-0 align-self-center">{{ fight.details.round }}</div>
+
+          <div class="col-3 d-lg-none text-right p-0">Time:</div>
+          <div class="col-lg-1 col-9 text-center p-0 align-self-center">{{ fight.details.time }}</div>
+        </div>
+      </div>
+
+      <div class="card-footer text-center p-0">{{ fight.details.event.title }}</div>
+    </div>
+  {% endif %}
+{% endfor %}

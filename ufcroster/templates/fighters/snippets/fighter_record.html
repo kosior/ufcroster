@@ -1,0 +1,44 @@
+<div class="row p-1 pb-3">
+    <div class="col-sm d-flex flex-column">
+        <div class="text-center text-success pb-1"><strong>WINS</strong></div>
+        <div class="row align-items-lg-center border-top border-success m-0 h-100 ur-border-w">
+            <div class="col-lg-6 col-md-12 text-center" style="font-size: 40px;">{{ fighter.record.wins }}</div>
+            <div class="col-lg-6 col-md-12 text-lg-left text-center pr-0 pl-2" style="font-size: 11px;">
+                <div>{{ fighter.record.wins_ko_tko }} - KO/TKO</div>
+                <div>{{ fighter.record.wins_sub }} - SUBMISSIO{{ fighter.record.wins_sub|pluralize:"N,NS" }}</div>
+                <div>{{ fighter.record.wins_dec }} - DECISIO{{ fighter.record.wins_dec|pluralize:"N,NS" }}</div>
+                {% if fighter.record.wins_other %}
+                    <div>{{ fighter.record.wins_other }} - OTHE{{ fighter.record.wins_other|pluralize:"R,RS" }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-sm d-flex flex-column">
+        <div class="text-center text-danger pb-1"><strong>LOSSES</strong></div>
+        <div class="row align-items-lg-center border-top border-danger m-0 h-100 ur-border-w">
+            <div class="col-lg-6 col-md-12 text-center" style="font-size: 40px;">{{ fighter.record.losses }}</div>
+            <div class="col-lg-6 col-md-12 text-lg-left text-center pr-0 pl-2" style="font-size: 11px;">
+                <div>{{ fighter.record.losses_ko_tko }} - KO/TKO</div>
+                <div>{{ fighter.record.losses_sub }} - SUBMISSIO{{ fighter.record.losses_sub|pluralize:"S,NS" }}</div>
+                <div>{{ fighter.record.losses_dec }} - DECISIO{{ fighter.record.losses_dec|pluralize:"N,NS" }}</div>
+                {% if fighter.record.losses_other %}
+                    <div>{{ fighter.record.losses_other }} - OTHE{{ fighter.record.losses_other|pluralize:"R,RS" }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-sm d-flex flex-column">
+        <div class="text-center text-info pb-1"><strong>DRAWS</strong></div>
+        <div class="row align-items-lg-center border-top border-info m-0 h-100 ur-border-w">
+            <div class="col-lg-12 col-md-12 text-center" style="font-size: 40px;">{{ fighter.record.draws }}</div>
+        </div>
+    </div>
+    {% if fighter.record.nc %}
+        <div class="col-sm d-flex flex-column">
+            <div class="text-center text-light pb-1"><strong>N/C</strong></div>
+            <div class="row align-items-lg-center border-top border-light m-0 h-100 ur-border-w">
+                <div class="col-lg-6 col-md-12 text-center" style="font-size: 40px;">{{ fighter.record.nc }}</div>
+            </div>
+        </div>
+    {% endif %}
+</div>

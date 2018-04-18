@@ -1,0 +1,11 @@
+{% load staticfiles %}
+
+<div class="m-2">
+    <a class="btn text-primary font-weight-bold" href="{% url 'fighters:detail' fighter.slug %}">
+        <div class="card text-center h-100 border-0 ur-shadow" style="width: 11rem;">
+            <div class="card-header word-wrap p-1 border-0">{{ fighter.name }}</div>
+            <img class="card-img rounded-0" src="{{ fighter.image.url }}" alt="">
+            <div class="card-footer"><p class="card-text">{{ fighter.record.total }}</p></div>
+        </div>
+    </a>
+</div>

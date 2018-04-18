@@ -1,0 +1,11 @@
+<div class="container my-0">
+    <div class="row justify-content-lg-center">
+        {% for url_, display in fighter.urls.display_list %}
+            <div class="col-lg-1 col-md-3 col-sm-6 col-6 mb-2 text-center">
+                <a class="btn btn-outline-primary btn-sm btn-block btn-f-url" href="{{ url_ }}" target="_blank">
+                    {{ display|safe }}
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>

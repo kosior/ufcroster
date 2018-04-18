@@ -1,0 +1,23 @@
+<div class="card mb-3 ur-shadow ur-bt" style="min-height: 120px;">
+  <div class="card-header p-0 font-weight-bold text-left pl-3 border-0 card-bg">
+    {% include 'fighters/snippets/fighter_anchor.html' with fighter=fight.fighter %}
+  </div>
+  <div class="card-body p-0 d-flex">
+    <div class="row align-self-center">
+      <div class="col-3 align-self-center pr-0">
+        <img src="{{ fight.fighter.image.url }}" class="img-fluid">
+      </div>
+      <div class="col-6 align-self-center p-0" style="font-size: 12px; opacity: 0.8;">
+        <div>{{ fight.details.date }}</div>
+        <div></div>
+        <div>{{ fight.details.event }}</div>
+      </div>
+      <div class="col-3 align-self-center pl-0">
+        <img src="{{ fight.opponent.image.url }}" class="img-fluid">
+      </div>
+    </div>
+  </div>
+  <div class="card-footer p-0 font-weight-bold text-right pr-3 border-0 card-bg">
+    {% include 'fighters/snippets/fighter_anchor.html' with fighter=fight.opponent %}
+  </div>
+</div>

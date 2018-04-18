@@ -1,0 +1,10 @@
+{% load fighter_tags %}
+
+{% for result in last_5_results %}
+  <div class="badge text-center bg-{% result_badge result %}" style="width: 25px; margin: 1px">{{ result }}</div>
+{% empty %}
+  <div class="badge text-center">-</div>
+{% endfor %}
+{% if show_description %}
+  <small><br>last 5 fights (latest to oldest)</small>
+{% endif %}

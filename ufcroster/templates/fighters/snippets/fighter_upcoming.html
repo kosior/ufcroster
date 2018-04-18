@@ -1,0 +1,31 @@
+<div class="card text-center mt-2 ur-shadow">
+  <div class="card-header">
+    {{ upcoming_fight.details.date }}
+  </div>
+  <div class="card-body">
+    <div class="row text-center">
+      <div class="col-lg-5">
+        <div class="h2 font-weight-bold">{{ upcoming_fight.fighter }}</div>
+        <div class="col text-center p-1 align-self-center">
+          {% include 'fighters/snippets/fighter_last_5.html' with last_5_results=upcoming_fight.fighter.record.last_5_list show_description=True %}
+        </div>
+        <br>
+        {{ upcoming_fight.fighter.record.total }}
+      </div>
+      <div class="col-lg-2 h2">vs.</div>
+      <div class="col-lg-5">
+        <div class="h2 font-weight-bold">
+          {% include 'fighters/snippets/fighter_anchor.html' with fighter=upcoming_fight.opponent %}
+        </div>
+        <div class="col text-center p-1 align-self-center">
+          {% include 'fighters/snippets/fighter_last_5.html' with last_5_results=upcoming_fight.opponent_last_5_list show_description=True %}
+        </div>
+        <br>
+        {{ upcoming_fight.opponent_record_before|default:'-' }}
+      </div>
+    </div>
+  </div>
+  <div class="card-footer">
+    {{ upcoming_fight.details.event.title }}
+  </div>
+</div>

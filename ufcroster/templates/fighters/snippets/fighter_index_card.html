@@ -1,0 +1,19 @@
+<div class="card mb-3 ur-shadow ur-bt" style="min-height: 120px;">
+  <div class="card-body p-2">
+      <div class="row">
+        <div class="col-4 pr-0">
+          <img src="{{ fighter.image.url }}" class="img-fluid">
+        </div>
+        <div class="col-8 text-left">
+          <div>
+            <a class="text-primary font-weight-bold" href="{% url 'fighters:detail' fighter.slug %}">
+              {{ fighter.name }}
+            </a>
+          </div>
+          <div>{{ fighter.record.total }}</div>
+          <div>{{ fighter.weight_class }}</div>
+          <div><i class="{{ fighter.country.flag_css }}"></i> {{ fighter.country.name }}</div>
+        </div>
+      </div>
+  </div>
+</div>
