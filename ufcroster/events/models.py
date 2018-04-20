@@ -10,8 +10,8 @@ class Event(TimeStampedModel):
     venue = models.CharField(max_length=255, blank=True)
     poster = models.ImageField(blank=True)
     promotion = models.CharField(max_length=255, blank=True)
-    sherdog_url = models.URLField(max_length=255, blank=True, null=True, unique=True)
-    ufc_url = models.URLField(max_length=255, blank=True, null=True, unique=True)
+    sherdog_url = models.URLField(max_length=255, blank=True, null=True)
+    ufc_url = models.URLField(max_length=255, blank=True, null=True)
     active = models.BooleanField(default=False)
 
     def __str__(self):
