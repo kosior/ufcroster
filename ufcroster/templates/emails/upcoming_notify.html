@@ -1,0 +1,14 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+  <h3>New Upcoming Fights</h3>
+
+  {% for fight in fights %}
+    <div>{{ fight.fighter.name }} vs. {{ fight.opponent.name }} - {{ fight.details.date }}</div>
+    <br>
+  {% endfor %}
+
+  {% include 'emails/snippets/unsubscribe.html' %}
+{% endblock content %}
+
+

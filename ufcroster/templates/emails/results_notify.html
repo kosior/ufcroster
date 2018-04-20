@@ -1,0 +1,15 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+  <h3>Results</h3>
+
+  {% for fight in fights %}
+    <div>{{ fight.fighter.name }} - {{ fight.get_result_display }} - Opponent: {{ fight.opponent.name }}</div>
+    <div>Method: {{ fight.details.method_display }}</div>
+    <br>
+  {% endfor %}
+
+  {% include 'emails/snippets/unsubscribe.html' %}
+{% endblock content %}
+
+
