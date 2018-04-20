@@ -18,7 +18,7 @@ if READ_DOT_ENV_FILE:
 
 DEBUG = env.bool('DJANGO_DEBUG', False)
 
-SITE_URL = 'https://www.ufcroster.com'
+SITE_URL = 'https://beta.ufcroster.com'
 
 INTERNAL_IPS = []
 
@@ -200,16 +200,10 @@ MEDIA_URL = '/media/'
 AUTH_USER_MODEL = 'users.User'
 
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ],
-
-}
-
-COUNTRIES_URL_CODES = {
-    'pl',
-}
+COUNTRIES_URL_CODES = (
+    'PL',
+    'IE'
+)
 
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'

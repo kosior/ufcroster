@@ -25,10 +25,11 @@ if os.getenv('DOCKER_CONTAINER'):
     CACHES = {
         'default': {
             'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': 'redis://redis:6379/0',
+            'LOCATION': 'redis://localhost:6379/0',
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            }
+            },
+            'TIMEOUT': 86400,
         }
     }
 else:
@@ -36,9 +37,16 @@ else:
         'default': {
             'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
             'LOCATION': str(ROOT_DIR.path('temp', 'cache')),
-            'TIMEOUT': None,
+            'TIMEOUT': 86400,
         }
     }
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+
+}
 
 
 TEST_EMAIL = env.str('TEST_EMAIL', None)
