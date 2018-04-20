@@ -37,7 +37,7 @@ class Fighter(TimeStampedModel):
     nickname = models.CharField(_('Nickname'), max_length=255, blank=True, null=True)
     birthdate = models.DateField(_('Birthdate'), blank=True, null=True)
     birthplace = models.CharField(_('Brith place'), max_length=50, blank=True)
-    country = CountryField(blank=True, null=True, default=None)
+    country = CountryField(blank=True, null=True, default=None, db_index=True)
     nationality = models.CharField(_('Nationality'), max_length=20, blank=True)
     gender = models.CharField(max_length=1, blank=True, choices=GENDER)
 
