@@ -1,5 +1,6 @@
 import logging
 
+from django.db.utils import IntegrityError
 from rest_framework import serializers
 
 from common.utils import restructure_fields_by_template
@@ -111,7 +112,13 @@ class FightSerializer(serializers.ModelSerializer):
         event_data = details_data.pop('event')
 
         opponent, _ = Fighter.objects.rest_get_or_create(**opponent_data)
-        event, _ = Event.objects.get_or_create(**event_data)
+
+        try:
+            event, _ = Event.objects.get_or_create(**event_data)
+        except IntegrityError:
+            logger.error(f'Problem with getting an event. Fighter: {fighter.slug}')
+            event = None
+
         fight_details, _ = FightDetails.objects.rest_get_or_create(fighter=fighter, event=event, **details_data)
 
         fight = Fight.objects.create(fighter=fighter, opponent=opponent, details=fight_details, **validated_data)
