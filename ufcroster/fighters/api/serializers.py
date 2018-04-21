@@ -116,7 +116,7 @@ class FightSerializer(serializers.ModelSerializer):
         try:
             event, _ = Event.objects.get_or_create(**event_data)
         except IntegrityError:
-            logger.error(f'Problem with getting an event. Fighter: {fighter.slug}')
+            logger.error(f'Problem with getting/creating an event. Fighter: {fighter.slug} | {event_data}')
             event = None
 
         fight_details, _ = FightDetails.objects.rest_get_or_create(fighter=fighter, event=event, **details_data)
