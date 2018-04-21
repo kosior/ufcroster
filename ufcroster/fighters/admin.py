@@ -3,17 +3,19 @@ from django.contrib import admin
 from .models import Fighter, FighterRecord, FighterUrls, FightDetails, Fight
 
 
+class FighterUrlsInline(admin.StackedInline):
+    model = FighterUrls
+
+
+class FighterRecordInline(admin.StackedInline):
+    model = FighterRecord
+
+
 class FighterAdmin(admin.ModelAdmin):
     list_display = ('name', 'active', 'in_ufc', 'country', 'created')
     list_filter = ('country',)
-
-
-class FighterRecordAdmin(admin.ModelAdmin):
-    list_display = ('fighter', )
-
-
-class FighterUrlsAdmin(admin.ModelAdmin):
-    list_display = ('fighter', 'ufc', 'sherdog')
+    ordering = ['-active']
+    inlines = [FighterUrlsInline, FighterRecordInline]
 
 
 class FightDetailsAdmin(admin.ModelAdmin):
@@ -28,7 +30,5 @@ class FightAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Fighter, FighterAdmin)
-admin.site.register(FighterRecord, FighterRecordAdmin)
-admin.site.register(FighterUrls, FighterUrlsAdmin)
 admin.site.register(FightDetails, FightDetailsAdmin)
 admin.site.register(Fight, FightAdmin)
