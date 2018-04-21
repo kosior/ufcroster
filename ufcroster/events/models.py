@@ -4,7 +4,7 @@ from common.models import TimeStampedModel
 
 
 class Event(TimeStampedModel):
-    title = models.CharField(max_length=255, unique=True)
+    title = models.CharField(max_length=255)
     date = models.DateTimeField(blank=True, null=True)
     location = models.CharField(max_length=255, blank=True)
     venue = models.CharField(max_length=255, blank=True)
