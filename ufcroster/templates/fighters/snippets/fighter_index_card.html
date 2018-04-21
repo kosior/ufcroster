@@ -12,7 +12,7 @@
           </div>
           <div>{{ fighter.record.total }}</div>
           <div>{{ fighter.weight_class }}</div>
-          <div><i class="{{ fighter.country.flag_css }}"></i> {{ fighter.country.name }}</div>
+          <div><i class="flag-icon flag-icon-{{ fighter.country.code|lower }}"></i> {{ fighter.country.name }}</div>
         </div>
       </div>
   </div>
