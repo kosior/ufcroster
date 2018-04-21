@@ -54,7 +54,7 @@ class FightHelper:
             'KO/TKO': ['ko', 'tko'],
             'SUBMISSION': ['submission', 'technical submission'],
             'DECISION': ['decision'],
-            'OTHER': ['dq', 'disqualification'],
+            'OTHER': ['dq', 'disqualification', 'n/a'],
             'NC': ['nc', 'no decision', 'no contest'],
             'DRAW': ['draw']
         }
