@@ -15,5 +15,5 @@ def save_fight(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=FighterRecord)
-def save_fight(sender, instance, **kwargs):
+def save_fight_record(sender, instance, **kwargs):
     invalidate_fights_cache([instance.fighter_id])
