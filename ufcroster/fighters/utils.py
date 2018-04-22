@@ -34,7 +34,7 @@ def create_or_update_fighter(sherdog_url, in_ufc=False, active=False):
                 try:
                     fight.save()
                 except IntegrityError:
-                    logger.error(f'Error when saving fight ({fighter.slug})')
+                    logger.exception(f'Error when saving fight ({fighter.slug})')
             else:
                 logger.warning(f'Invalid fight data ({fighter.slug})')
     else:
@@ -59,7 +59,7 @@ def set_opponent_info(fight):
                 try:
                     fight_serialized.save()
                 except IntegrityError:
-                    logger.error(f'Error when saving fight ({opponent.slug})')
+                    logger.exception(f'Error when saving fight ({opponent.slug})')
 
         opponent_fight_ordinal = opponent.get_fight_ordinal(fight=fight, is_db_updated=True)
 
