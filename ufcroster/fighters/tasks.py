@@ -13,7 +13,8 @@ logger = get_task_logger(__name__)
 
 
 @task
-def set_opponent_info_task(fight):
+def set_opponent_info_task(fight_id):
+    fight = Fight.objects.get(id=fight_id)
     set_opponent_info(fight)
 
 
@@ -25,7 +26,8 @@ def check_fighter_for_upcoming(slug, sherdog_url):
         upcoming = FightSerializer(data=upcoming_data, context={'slug': slug})
         if upcoming.is_valid():
             fight = upcoming.save()
-            set_opponent_info_task.delay(fight)
+            fight.fighter.record.save()
+            set_opponent_info_task.delay(fight.id)
             return fight.id
 
 
@@ -36,17 +38,20 @@ def update_upcoming_fight_task(upcoming_fight):
         return fight.id
 
 
-@task  # update with celery beat
+@task
 def search_for_upcoming():
     fighters_with_upcoming = Fight.objects.upcoming().values_list('fighter_id', flat=True)
     fighters_data = Fighter.objects.active().exclude(id__in=fighters_with_upcoming).values_list('slug',
                                                                                                 'urls__sherdog')
-    tasks = [check_fighter_for_upcoming.s(slug, sherdog_url, countdown=2) for slug, sherdog_url in fighters_data]
+    tasks = [
+        check_fighter_for_upcoming.signature((slug, sherdog_url), countdown=2)
+        for slug, sherdog_url in fighters_data
+    ]
     callback = send_upcoming_email_notification.si().on_error(send_upcoming_email_notification.si())
     chord(tasks)(callback)
 
 
-@task  # update with celery beat
+@task
 def update_past_upcoming():
     past_upcoming_fights = Fight.objects.fight_with_relations().upcoming().filter(details__date__lt=now())
     tasks = [update_upcoming_fight_task.s(upcoming_fight) for upcoming_fight in past_upcoming_fights]
