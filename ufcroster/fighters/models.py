@@ -171,7 +171,7 @@ class FighterRecord(TimeStampedModel):
     def get_total(self):
         record = f'{self.wins} - {self.losses} - {self.draws}'
         if self.nc:
-            record = f'{record} N/C: {self.nc} '
+            record = f'{record}, {self.nc}NC'
         return record
 
     def is_consistent(self):
