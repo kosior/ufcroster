@@ -1,7 +1,7 @@
+from autoslug import AutoSlugField
 from django.db import models
 from django.db.models import Sum, Case, When, IntegerField
 from django.urls import reverse
-from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_countries.fields import CountryField
 from model_utils import FieldTracker
@@ -32,8 +32,8 @@ class Fighter(TimeStampedModel):
         (MALE, _('Male')),
     )
 
-    slug = models.SlugField(unique=True, blank=True)
     name = models.CharField(_('Full name'), max_length=255)
+    slug = AutoSlugField(populate_from='name', unique=True)
     nickname = models.CharField(_('Nickname'), max_length=255, blank=True, null=True)
     birthdate = models.DateField(_('Birthdate'), blank=True, null=True)
     birthplace = models.CharField(_('Brith place'), max_length=50, blank=True)
@@ -64,10 +64,6 @@ class Fighter(TimeStampedModel):
 
     class Meta:
         ordering = ['rank']
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
