@@ -30,7 +30,7 @@
           {% for country in countries %}
             <div class="p-2 d-flex align-items-center">
               <span class="flag-icon flag-icon-{{ country|lower }} mx-2 flag-menu"></span>
-              <span class="mr-auto">{{ country.name }}</span>
+              <span class="mr-auto text-nowrap">{{ country.name }}</span>
               <a href="{% url 'fighters:by_country' country|lower %}" class="btn btn-sm btn-primary mx-2">Fighters</a>
               <a href="{% url 'fighters:upcoming_by_country' country|lower %}"
                  class="btn btn-sm btn-primary float-right">Upcoming fights</a>
